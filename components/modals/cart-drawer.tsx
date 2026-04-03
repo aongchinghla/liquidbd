@@ -2,12 +2,15 @@ import { Minus, Plus, Trash2, X } from "lucide-react";
 
 export interface CartItem {
   id: number;
+  cartItemId: string;
   name: string;
   price: number;
   tag?: string;
   category: string;
   image: string;
   quantity: number;
+  selectedColor?: string;
+  selectedSize?: string;
 }
 
 function formatPrice(price: number) {
@@ -21,8 +24,8 @@ function formatPrice(price: number) {
 interface CartDrawerProps {
   cart: CartItem[];
   subtotal: number;
-  removeFromCart: (id: number) => void;
-  updateCartQuantity: (id: number, delta: number) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateCartQuantity: (cartItemId: string, delta: number) => void;
   setIsCartOpen: (open: boolean) => void;
   setIsCheckoutOpen: (open: boolean) => void;
 }
@@ -58,7 +61,7 @@ export default function CartDrawer({
             </div>
           ) : (
             cart.map((item) => (
-              <div key={item.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div key={item.cartItemId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
                 <div className="flex gap-4">
                   <img src={item.image} alt={item.name} className="h-24 w-20 rounded-xl object-cover" />
                   <div className="flex-1">
@@ -66,10 +69,18 @@ export default function CartDrawer({
                       <div>
                         <p className="text-sm text-white/45">{item.category}</p>
                         <h5 className="mt-1 font-medium">{item.name}</h5>
+                        <div className="mt-1 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-white/40">
+                          {item.selectedSize && <span>Size: {item.selectedSize}</span>}
+                          {item.selectedColor && (
+                            <div className="flex items-center gap-1">
+                              <span>Color: {item.selectedColor}</span>
+                            </div>
+                          )}
+                        </div>
                         <p className="mt-2 text-sm text-white/70">{formatPrice(item.price)}</p>
                       </div>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.cartItemId)}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-white/70"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -77,11 +88,11 @@ export default function CartDrawer({
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                       <div className="inline-flex items-center rounded-full border border-white/10 bg-black/30">
-                        <button onClick={() => updateCartQuantity(item.id, -1)} className="inline-flex h-10 w-10 items-center justify-center">
+                        <button onClick={() => updateCartQuantity(item.cartItemId, -1)} className="inline-flex h-10 w-10 items-center justify-center">
                           <Minus className="h-4 w-4" />
                         </button>
                         <span className="min-w-10 text-center text-sm">{item.quantity}</span>
-                        <button onClick={() => updateCartQuantity(item.id, 1)} className="inline-flex h-10 w-10 items-center justify-center">
+                        <button onClick={() => updateCartQuantity(item.cartItemId, 1)} className="inline-flex h-10 w-10 items-center justify-center">
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>

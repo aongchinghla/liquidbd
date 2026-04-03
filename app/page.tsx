@@ -8,6 +8,7 @@ import Collections from "@/components/homepage/collections";
 import ProductsSection from "@/components/homepage/our-products";
 import Banner from "@/components/homepage/banner";
 import FeaturedProducts from "@/components/homepage/featured-products";
+import BandCollaboration from "@/components/homepage/collaborators";
 import PhotoGallery from "@/components/homepage/photo-gallery";
 import { products } from "@/lib/products";
 import { useAppContext } from "@/context/app-context";
@@ -53,6 +54,7 @@ export default function Page() {
       <Collaborations />
       <ShopSection />
       <Banner />
+      <BandCollaboration />
       <Reviews />
       <PhotoGallery />
       <Newsletter />

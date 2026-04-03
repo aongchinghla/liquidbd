@@ -23,9 +23,9 @@ interface AppContextType {
   setIsCheckoutOpen: (open: boolean) => void;
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateCartQuantity: (productId: number, delta: number) => void;
+  addToCart: (product: Product, selectedColor?: string, selectedSize?: string) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateCartQuantity: (cartItemId: string, delta: number) => void;
   handleLogout: () => void;
   authMode: "login" | "signup";
   setAuthMode: (mode: "login" | "signup") => void;
@@ -41,20 +41,21 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-function mergeCartItem(prev: CartItem[], product: Product) {
-  const existing = prev.find((item) => item.id === product.id);
+function mergeCartItem(prev: CartItem[], product: Product, color?: string, size?: string) {
+  const cartItemId = `${product.id}-${color || ""}-${size || ""}`;
+  const existing = prev.find((item) => item.cartItemId === cartItemId);
   if (existing) {
     return prev.map((item) =>
-      item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
     );
   }
-  return [...prev, { ...product, quantity: 1 }];
+  return [...prev, { ...product, cartItemId, quantity: 1, selectedColor: color, selectedSize: size }];
 }
 
-function changeQuantity(prev: CartItem[], productId: number, delta: number) {
+function changeQuantity(prev: CartItem[], cartItemId: string, delta: number) {
   return prev
     .map((item) =>
-      item.id === productId ? { ...item, quantity: item.quantity + delta } : item
+      item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + delta } : item
     )
     .filter((item) => item.quantity > 0);
 }
@@ -204,17 +205,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [cart]
   );
 
-  const addToCart = (product: Product) => {
-    setCart((prev) => mergeCartItem(prev, product));
+  const addToCart = (product: Product, selectedColor?: string, selectedSize?: string) => {
+    setCart((prev) => mergeCartItem(prev, product, selectedColor, selectedSize));
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+  const removeFromCart = (cartItemId: string) => {
+    setCart((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
   };
 
-  const updateCartQuantity = (productId: number, delta: number) => {
-    setCart((prev) => changeQuantity(prev, productId, delta));
+  const updateCartQuantity = (cartItemId: string, delta: number) => {
+    setCart((prev) => changeQuantity(prev, cartItemId, delta));
   };
 
 

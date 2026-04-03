@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 const collections = [
@@ -29,52 +31,59 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
   return (
     <section
       id="collections"
-      className="mx-auto max-w-[1600px] px-6 py-10 lg:px-10 lg:py-14"
+      className="mx-auto max-w-[1600px] px-6 py-10 lg:px-10 lg:py-16"
     >
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      {/* Header Section */}
+      <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="card-fade text-xs uppercase tracking-[0.35em] text-white/45">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40">
             Collections
           </p>
-          <h3 className="card-fade mt-3 text-3xl font-semibold md:text-4xl">
+          <h3 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">
             Explore Our Signature Series
           </h3>
         </div>
-        <p className="card-fade max-w-md text-sm leading-6 text-white/55">
+        <p className="max-w-md text-sm leading-relaxed text-white/50 md:text-base">
           Discover cultural storytelling, mythological inspiration, and unique
           artistic collaborations through premium wearable art.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Grid Layout */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((item) => (
           <div
             key={item.title}
-            className="card-fade group relative overflow-hidden rounded-[1.75rem] border border-white/30 bg-black"
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 transition-all duration-500"
           >
-            <div className="relative h-[530px] w-full">
+            {/* Optimized Image Height for Mobile */}
+            <div className="relative h-[420px] w-full xs:h-[480px] md:h-[500px] lg:h-[530px]">
               <Image
                 src={item.image}
                 alt={item.title}
                 fill
-                className="object-cover transition duration-500 group-hover:scale-105"
+                className="object-cover transition duration-700 ease-out group-hover:scale-105"
+                sizes="(max-w: 768px) 100vw, (max-w: 1200px) 50vw, 33vw"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {/* Dark Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
-              <div className="absolute inset-x-6 bottom-6">
-                <h4 className="text-2xl font-semibold text-white md:text-3xl">
+              {/* Content Overlay */}
+              <div className="absolute inset-x-6 bottom-8 md:inset-x-8 md:bottom-10">
+                <h4 className="text-2xl font-bold text-white md:text-3xl">
                   {item.title}
                 </h4>
-                <p className="mt-2 max-w-xs text-sm text-white/80 md:text-base">
+                <p className="mt-2 line-clamp-2 max-w-xs text-sm text-white/70 md:text-base">
                   {item.subtitle}
                 </p>
 
+                {/* Updated Button: Less Rounded & Original Color */}
                 <button
                   onClick={() => onSelectCategory?.(item.button)}
-                  className="mt-5 rounded-xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
+                  className="mt-6 rounded-lg bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-sky-500 active:scale-95 sm:w-auto"
                 >
-                  {item.button}
+                  Explore {item.button}
                 </button>
               </div>
             </div>
