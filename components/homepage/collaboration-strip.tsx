@@ -21,44 +21,37 @@ export default function Collaborations() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".collab-item",
-        { opacity: 0, y: 50 },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
           duration: 0.9,
-          stagger: 0.15,
+          stagger: 0.1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 80%",
+            start: "top 85%",
             toggleActions: "play none none none",
           },
         }
       );
     }, containerRef);
-
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      id="collaborations"
-      ref={containerRef}
-      className="border-y border-white/20 py-10 lg:py-6"
-    >
+    <section id="collaborations" ref={containerRef} className="border-y border-white/10 py-6 lg:py-6">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-8">
+        <div className="grid grid-cols-2 items-center justify-items-center gap-8 md:grid-cols-4 lg:gap-12">
           {collaborators.map((brand) => (
-            <div
-              key={brand.name}
-              className="collab-item flex flex-8 basis-[220px] items-center justify-center py-2"
-            >
+            <div key={brand.name} className="collab-item flex w-full items-center justify-center py-2">
               <Image
                 src={brand.src}
                 alt={brand.name}
                 width={brand.width}
                 height={brand.height}
-                className="h-auto max-h-[56px] w-auto object-contain opacity-80"
+                className="h-auto max-h-[40px] w-auto object-contain opacity-70 transition-opacity hover:opacity-100 md:max-h-[56px]"
+                priority
               />
             </div>
           ))}
