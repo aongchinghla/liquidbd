@@ -7,6 +7,8 @@ import { products, Product } from "@/lib/products";
 import { useAppContext } from "@/context/app-context";
 import { ChevronRight, Minus, Plus, ShoppingBag, Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
+import ProductCard from "@/components/ui/product-card";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-BD", {
@@ -22,17 +24,20 @@ export default function ProductDetailsPage() {
   const { addToCart } = useAppContext();
   
   const [product, setProduct] = useState<Product | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [zoomStyle, setZoomStyle] = useState({ transformOrigin: "center" });
+  const [isZooming, setIsZooming] = useState(false);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const foundProduct = products.find((p) => p.slug === slug);
     if (foundProduct) {
       setProduct(foundProduct);
-      setSelectedImage(foundProduct.image);
+      setSelectedIndex(0);
       if (foundProduct.colors.length > 0) {
         setSelectedColor(foundProduct.colors[0].name);
       }
@@ -63,6 +68,23 @@ export default function ProductDetailsPage() {
     }, 1000);
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+    const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect();
+    const x = ((e.pageX - left) / width) * 100;
+    const y = ((e.pageY - top) / height) * 100;
+    setZoomStyle({ transformOrigin: `${x}% ${y}%` });
+  };
+
+  const relatedProducts = products
+    .filter((p) => p.category === product.category && p.slug !== product.slug)
+    .slice(0, 4);
+
+  // Fallback to other products if none in the same category
+  const finalRelatedProducts = relatedProducts.length > 0 
+    ? relatedProducts 
+    : products.filter(p => p.slug !== product.slug).slice(0, 4);
+
   return (
     <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-6 lg:px-10 lg:py-10">
       {/* Breadcrumbs */}
@@ -77,31 +99,41 @@ export default function ProductDetailsPage() {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-10 justify-items-center lg:justify-items-start">
         {/* Left Side: Image Gallery */}
         <div className="space-y-4 w-full lg:max-w-[520px] lg:ml-auto">
-          <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+          <div 
+            ref={imageContainerRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsZooming(true)}
+            onMouseLeave={() => setIsZooming(false)}
+            className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] cursor-zoom-in"
+          >
             <Image
-              src={selectedImage}
+              src={product.images[selectedIndex] || product.image}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-700 hover:scale-105"
+              style={isZooming ? { transform: 'scale(1.8)', ...zoomStyle } : {}}
+              className="object-cover transition-transform duration-200 ease-out"
               priority
+              sizes="(max-width: 1024px) 100vw, 520px"
             />
             {product.tag && (
-              <span className="absolute left-6 top-6 rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
+              <span className="absolute left-6 top-6 z-10 rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
                 {product.tag}
               </span>
             )}
           </div>
           
           {product.images.length > 1 && (
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-4 overflow-x-auto py-3 px-3 scrollbar-none">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSelectedImage(img)}
-                  className={`relative h-16 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${selectedImage === img ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
+                  onClick={() => setSelectedIndex(idx)}
+                  className={`relative aspect-square h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 ${selectedIndex === idx 
+                    ? "border-white grayscale-0 opacity-100 scale-110 z-10" 
+                    : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"
                     }`}
                 >
-                  <Image src={img} alt={`${product.name} ${idx}`} fill className="object-cover" />
+                  <Image src={img} alt={`${product.name} ${idx}`} fill className="object-cover" sizes="80px" />
                 </button>
               ))}
             </div>
@@ -118,7 +150,7 @@ export default function ProductDetailsPage() {
           </h1>
           
           <div className="mt-4 flex items-center gap-5">
-            <span className="text-xl font-light tracking-tight text-white/90">
+            <span className="text-xl font-bold tracking-tight text-white/90">
               {formatPrice(product.price)}
             </span>
             <div className="flex items-center gap-1">
@@ -245,6 +277,29 @@ export default function ProductDetailsPage() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Related Products Section */}
+      <div className="mt-24 border-t border-white/10 pt-16">
+        <div className="mb-10 flex items-end justify-between">
+          <div className="space-y-2">
+            <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/40">You Might Also Like</span>
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">Related Products</h2>
+          </div>
+          <Link href="/shop" className="text-xs font-semibold uppercase tracking-widest text-white/60 hover:text-white transition decoration-white/20 underline underline-offset-8">
+            View All Shop
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6 lg:gap-8">
+          {finalRelatedProducts.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+              addToCart={() => addToCart(p, p.colors[0]?.name || "", p.sizes[0] || "")}
+              formatPrice={formatPrice}
+            />
+          ))}
         </div>
       </div>
     </div>

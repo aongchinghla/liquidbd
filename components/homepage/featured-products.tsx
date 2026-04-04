@@ -48,7 +48,7 @@ export default function FeaturedProducts({
             Featured
           </p>
           <h3 className="mt-3 text-3xl font-semibold md:text-4xl">
-            Liquid BD Storefront
+            Liquid Storefront
           </h3>
         </div>
 

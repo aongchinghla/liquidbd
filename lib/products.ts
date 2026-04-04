@@ -32,7 +32,12 @@ export const products: Product[] = [
     tag: "CHT",
     category: "Cht",
     image: "/product/hojagiri.jpg",
-    images: ["/product/hojagiri.jpg"],
+    images: [
+      "/product/hojagiri.jpg",
+      "/product/hojagiri.jpg",
+      "/product/hojagiri.jpg",
+      "/product/hojagiri.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#000000" },
       { name: "Maroon", hex: "#800000" },
@@ -47,7 +52,12 @@ export const products: Product[] = [
     tag: "Best Seller",
     category: "",
     image: "/product/ajau.jpg",
-    images: ["/product/ajau.jpg"],
+    images: [
+      "/product/ajau.jpg",
+      "/product/ajau.jpg",
+      "/product/ajau.jpg",
+      "/product/ajau.jpg"
+    ],
     colors: [
       { name: "Off White", hex: "#F5F5F5" },
       { name: "Black", hex: "#1A1A1A" },
@@ -62,7 +72,12 @@ export const products: Product[] = [
     tag: "",
     category: "Collaboration",
     image: "/product/rabuga_bitch.jpg",
-    images: ["/product/rabuga_bitch.jpg"],
+    images: [
+      "/product/rabuga_bitch.jpg",
+      "/product/rabuga_bitch.jpg",
+      "/product/rabuga_bitch.jpg",
+      "/product/rabuga_bitch.jpg"
+    ],
     colors: [
       { name: "Charcoal", hex: "#333333" },
       { name: "Navy", hex: "#000080" },
@@ -77,7 +92,12 @@ export const products: Product[] = [
     tag: "Limited",
     category: "Mythology",
     image: "/product/buga_rani.jpg",
-    images: ["/product/buga_rani.jpg"],
+    images: [
+      "/product/buga_rani.jpg",
+      "/product/buga_rani.jpg",
+      "/product/buga_rani.jpg",
+      "/product/buga_rani.jpg"
+    ],
     colors: [
       { name: "Deep Red", hex: "#8B0000" },
       { name: "Black", hex: "#000000" },
@@ -92,7 +112,12 @@ export const products: Product[] = [
     tag: "Premium",
     category: "Ganna",
     image: "/product/ganna.jpg",
-    images: ["/product/ganna.jpg"],
+    images: [
+      "/product/ganna.jpg",
+      "/product/ganna.jpg",
+      "/product/ganna.jpg",
+      "/product/ganna.jpg"
+    ],
     colors: [
       { name: "White", hex: "#FFFFFF" },
       { name: "Black", hex: "#1A1A1A" },
@@ -107,7 +132,12 @@ export const products: Product[] = [
     tag: "",
     category: "",
     image: "/product/garo_king.jpg",
-    images: ["/product/garo_king.jpg"],
+    images: [
+      "/product/garo_king.jpg",
+      "/product/garo_king.jpg",
+      "/product/garo_king.jpg",
+      "/product/garo_king.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#000000" },
     ],
@@ -121,7 +151,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "",
     image: "/product/garo_queen.jpg",
-    images: ["/product/garo_queen.jpg"],
+    images: [
+      "/product/garo_queen.jpg",
+      "/product/garo_queen.jpg",
+      "/product/garo_queen.jpg",
+      "/product/garo_queen.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#1A1A1A" },
       { name: "White", hex: "#FFFFFF" },
@@ -136,7 +171,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "Ganna",
     image: "/ha.a_ganna.jpg",
-    images: ["/ha.a_ganna.jpg"],
+    images: [
+      "/ha.a_ganna.jpg",
+      "/ha.a_ganna.jpg",
+      "/ha.a_ganna.jpg",
+      "/ha.a_ganna.jpg"
+    ],
     colors: [
       { name: "Olive", hex: "#556B2F" },
       { name: "Earth", hex: "#A0522D" },
@@ -151,7 +191,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "Ganna",
     image: "/product/jang.ki_ganna.jpg",
-    images: ["/product/jang.ki_ganna.jpg"],
+    images: [
+      "/product/jang.ki_ganna.jpg",
+      "/product/jang.ki_ganna.jpg",
+      "/product/jang.ki_ganna.jpg",
+      "/product/jang.ki_ganna.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#1A1A1A" },
     ],
@@ -165,7 +210,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "",
     image: "/product/kha_marak.jpg",
-    images: ["/product/kha_marak.jpg"],
+    images: [
+      "/product/kha_marak.jpg",
+      "/product/kha_marak.jpg",
+      "/product/kha_marak.jpg",
+      "/product/kha_marak.jpg"
+    ],
     colors: [
       { name: "Navy", hex: "#000080" },
     ],
@@ -179,7 +229,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "",
     image: "/product/kha_sangma.jpg",
-    images: ["/product/kha_sangma.jpg"],
+    images: [
+      "/product/kha_sangma.jpg",
+      "/product/kha_sangma.jpg",
+      "/product/kha_sangma.jpg",
+      "/product/kha_sangma.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#000000" },
     ],
@@ -193,7 +248,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "",
     image: "/product/liquid_tee.jpg",
-    images: ["/product/liquid_tee.jpg"],
+    images: [
+      "/product/liquid_tee.jpg",
+      "/product/liquid_tee.jpg",
+      "/product/liquid_tee.jpg",
+      "/product/liquid_tee.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#000000" },
       { name: "White", hex: "#FFFFFF" },
@@ -208,7 +268,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "",
     image: "/product/misi_saljong.jpg",
-    images: ["/product/misi_saljong.jpg"],
+    images: [
+      "/product/misi_saljong.jpg",
+      "/product/misi_saljong.jpg",
+      "/product/misi_saljong.jpg",
+      "/product/misi_saljong.jpg"
+    ],
     colors: [
       { name: "Orange", hex: "#FFA500" },
       { name: "Black", hex: "#1A1A1A" },
@@ -223,7 +288,12 @@ export const products: Product[] = [
     tag: "Capsule",
     category: "Nokna",
     image: "/product/nokna.jpg",
-    images: ["/product/nokna.jpg"],
+    images: [
+      "/product/nokna.jpg",
+      "/product/nokna.jpg",
+      "/product/nokna.jpg",
+      "/product/nokna.jpg"
+    ],
     colors: [
       { name: "Maroon", hex: "#800000" },
     ],
@@ -237,7 +307,12 @@ export const products: Product[] = [
     tag: "",
     category: "Ganna",
     image: "/product/red_ganna.jpg",
-    images: ["/product/red_ganna.jpg"],
+    images: [
+      "/product/red_ganna.jpg",
+      "/product/red_ganna.jpg",
+      "/product/red_ganna.jpg",
+      "/product/red_ganna.jpg"
+    ],
     colors: [
       { name: "Red", hex: "#FF0000" },
     ],
@@ -251,7 +326,12 @@ export const products: Product[] = [
     tag: "",
     category: "Collaboration",
     image: "/product/sacrament.jpg",
-    images: ["/product/sacrament.jpg"],
+    images: [
+      "/product/sacrament.jpg",
+      "/product/sacrament.jpg",
+      "/product/sacrament.jpg",
+      "/product/sacrament.jpg"
+    ],
     colors: [
       { name: "Black", hex: "#000000" },
     ],
@@ -265,7 +345,12 @@ export const products: Product[] = [
     tag: "",
     category: "",
     image: "/product/wangala.jpg",
-    images: ["/product/wangala.jpg"],
+    images: [
+      "/product/wangala.jpg",
+      "/product/wangala.jpg",
+      "/product/wangala.jpg",
+      "/product/wangala.jpg"
+    ],
     colors: [
       { name: "Mustard", hex: "#FFDB58" },
       { name: "Black", hex: "#1A1A1A" },

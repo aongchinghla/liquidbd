@@ -12,6 +12,7 @@ export default function IndigenousBanner() {
           fill
           className="object-cover object-center"
           priority
+          sizes="100vw"
         />
 
         {/* Dark Overlay */}

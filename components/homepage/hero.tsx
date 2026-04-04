@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -26,13 +27,17 @@ export default function Hero() {
           </p>
 
           <div className="hero-fade mt-8 flex flex-wrap gap-4">
-            <button className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]">
-              Shop New Drop
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <button className="rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/5">
-              Explore Collection
-            </button>
+            <Link href="/shop">
+              <button className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]">
+                Shop Now
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </Link>
+            <Link href="#collections">
+              <button className="rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/5">
+                Explore Collection
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -46,18 +51,16 @@ export default function Hero() {
               alt="Premium dark fashion t-shirt"
               className="h-[620px] w-full rounded-[1.5rem] object-cover"
             />
+            {/* Card Overlay - "Featured Drop" Text Removed */}
             <div className="absolute inset-x-8 bottom-8 rounded-[1.5rem] border border-white/10 bg-black/60 p-6 backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.35em] text-white/45">
-                Featured Drop
-              </p>
-              <div className="mt-3 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+              <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold">Culture Meets Craft</h3>
+                  <h3 className="text-2xl font-semibold text-white">Culture Meets Craft</h3>
                   <p className="mt-2 max-w-md text-sm text-white/65">
                     Rooted in Tradition Crafted with Purpose Woven with Heritage
                   </p>
                 </div>
-                <button className="rounded-full bg-white px-5 py-3 text-sm font-medium text-black">
+                <button className="rounded-full bg-white px-5 py-3 text-sm font-medium text-black transition-colors hover:bg-neutral-200">
                   Our Story
                 </button>
               </div>

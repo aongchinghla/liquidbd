@@ -39,6 +39,7 @@ export default function ShopPage() {
           fill
           className="object-cover opacity-40" 
           priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/20" />
 

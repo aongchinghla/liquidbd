@@ -46,6 +46,7 @@ export default function BandCollaboration() {
                 alt={band.bandName} 
                 fill 
                 className="object-contain opacity-90 transition-opacity hover:opacity-100"
+                sizes="(max-width: 768px) 128px, 208px"
               />
             </div>
             <div className="h-[1px] flex-1 bg-white/10" />

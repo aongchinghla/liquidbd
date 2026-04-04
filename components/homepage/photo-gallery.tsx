@@ -27,7 +27,7 @@ export default function InstagramStyleGallery() {
                 alt={`Gallery image ${photo.id}`}
                 fill
                 className="object-cover transition duration-500 group-hover:scale-105 group-hover:brightness-90"
-                sizes="(max-w-768px) 50vw, (max-w-1200px) 33vw, 25vw"
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               />
             </div>
           ))}
