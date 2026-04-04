@@ -117,50 +117,44 @@ export default function Navbar({
           <div className="flex items-center justify-self-end">
             {/* Desktop Navigation */}
             <nav className="hidden items-center gap-8 pr-8 text-base text-white/70 md:flex">
-              <Link 
-                href="/" 
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${
-                  pathname === "/" ? "text-white after:w-full" : "after:w-0"
-                }`}
+              <Link
+                href="/"
+                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/" ? "text-white after:w-full" : "after:w-0"
+                  }`}
               >
                 Home
               </Link>
-              <Link 
-                href="/shop" 
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${
-                  pathname === "/shop" || pathname.startsWith("/shop/") ? "text-white after:w-full" : "after:w-0"
-                }`}
+              <Link
+                href="/shop"
+                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/shop" || pathname.startsWith("/shop/") ? "text-white after:w-full" : "after:w-0"
+                  }`}
               >
                 Shop
               </Link>
-              <Link 
-                href="/about" 
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${
-                  pathname === "/about" ? "text-white after:w-full" : "after:w-0"
-                }`}
+              <Link
+                href="/about"
+                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/about" ? "text-white after:w-full" : "after:w-0"
+                  }`}
               >
                 About Us
               </Link>
-              <Link 
-                href="/journal" 
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${
-                  pathname === "/journal" ? "text-white after:w-full" : "after:w-0"
-                }`}
+              <Link
+                href="/journal"
+                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/journal" ? "text-white after:w-full" : "after:w-0"
+                  }`}
               >
                 Journal
               </Link>
             </nav>
 
             <div className="flex items-center gap-2 md:gap-3">
-              {/* Search Button - Visible on both Mobile & Desktop */}
               <button
                 onClick={() => {
                   setIsSearchOpen(!isSearchOpen);
                   if (isSearchOpen) setSearchQuery(""); // Clear when closing
                 }}
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition md:h-11 md:w-11 ${
-                  isSearchOpen ? "bg-white text-black" : "bg-white/[0.03] text-white/70 hover:text-white"
-                }`}
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition md:h-11 md:w-11 ${isSearchOpen ? "bg-white text-black" : "bg-white/[0.03] text-white/70 hover:text-white"
+                  }`}
               >
                 {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
               </button>
@@ -200,13 +194,12 @@ export default function Navbar({
         </div>
 
         {/* 3. Search Bar Expansion */}
-        <div 
+        <div
           ref={searchRef}
-          className={`absolute left-0 top-full w-full border-b border-white/10 bg-black/90 backdrop-blur-3xl transition-all duration-300 ease-in-out px-4 py-6 md:px-10 ${
-            isSearchOpen 
-              ? "opacity-100 translate-y-0 pointer-events-auto" 
+          className={`absolute left-0 top-full w-full border-b border-white/10 bg-black/90 backdrop-blur-3xl transition-all duration-300 ease-in-out px-4 py-6 md:px-10 ${isSearchOpen
+              ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 -translate-y-4 pointer-events-none"
-          }`}
+            }`}
         >
           <div className="mx-auto max-w-[800px] relative">
             <div className="relative group">
@@ -260,7 +253,7 @@ export default function Navbar({
                 </Link>
               </div>
             )}
-            
+
             {searchQuery.trim().length > 0 && searchResults.length === 0 && (
               <div className="absolute top-full left-0 w-full mt-4 bg-neutral-900/95 border border-white/10 rounded-2xl p-8 text-center text-white/40 backdrop-blur-xl">
                 No products found for "{searchQuery}"
@@ -273,29 +266,29 @@ export default function Navbar({
         {isMenuOpen && (
           <div className="absolute left-0 top-full z-[100] w-full border-b border-white/10 bg-neutral-950/95 px-6 py-6 shadow-2xl backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-6 text-base font-medium text-white/75">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 onClick={() => setIsMenuOpen(false)}
                 className={`transition-colors ${pathname === "/" ? "text-white font-bold" : "text-white/60"}`}
               >
                 Home
               </Link>
-              <Link 
-                href="/shop" 
+              <Link
+                href="/shop"
                 onClick={() => setIsMenuOpen(false)}
                 className={`transition-colors ${pathname === "/shop" || pathname.startsWith("/shop/") ? "text-white font-bold" : "text-white/60"}`}
               >
                 Shop
               </Link>
-              <Link 
-                href="/about" 
+              <Link
+                href="/about"
                 onClick={() => setIsMenuOpen(false)}
                 className={`transition-colors ${pathname === "/about" ? "text-white font-bold" : "text-white/60"}`}
               >
                 About Us
               </Link>
-              <Link 
-                href="/journal" 
+              <Link
+                href="/journal"
                 onClick={() => setIsMenuOpen(false)}
                 className={`transition-colors ${pathname === "/journal" ? "text-white font-bold" : "text-white/60"}`}
               >
