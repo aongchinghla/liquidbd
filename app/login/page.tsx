@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Mail, Lock, LogIn, User, Phone, Eye, EyeOff } from "lucide-react";
@@ -14,7 +14,7 @@ interface AuthForm {
   phone: string;
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const {
     setIsLoggedIn,
@@ -502,5 +502,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950 flex items-center justify-center"><div className="text-white font-bold opacity-20 uppercase tracking-[0.5em]">Loading...</div></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
