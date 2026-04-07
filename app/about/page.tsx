@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useGsapAnimations } from "@/hooks/use-gsap-animations";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import gsap from "gsap";
 
 type Milestone = {
   date: string;
@@ -122,22 +122,22 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
               key={index}
               onMouseEnter={() => setActiveMilestone(index)}
               className={`group relative cursor-pointer border-b border-white/5 px-6 py-7 transition-all duration-500 md:px-7 md:py-8 ${activeMilestone === index
-                  ? "bg-white/[0.02]"
-                  : "hover:bg-white/[0.01]"
+                ? "bg-white/[0.02]"
+                : "hover:bg-white/[0.01]"
                 }`}
             >
               <div
                 className={`absolute bottom-0 left-0 top-0 w-[2px] bg-[#2f7ea1] transition-all duration-500 ${activeMilestone === index
-                    ? "scale-y-100 opacity-100"
-                    : "scale-y-0 opacity-0"
+                  ? "scale-y-100 opacity-100"
+                  : "scale-y-0 opacity-0"
                   }`}
               />
 
               <div className="flex flex-col gap-2">
                 <span
                   className={`text-[11px] font-bold uppercase tracking-[0.18em] transition-colors duration-500 ${activeMilestone === index
-                      ? "text-[#2f7ea1]"
-                      : "text-white/20"
+                    ? "text-[#2f7ea1]"
+                    : "text-white/20"
                     }`}
                 >
                   {item.date}
@@ -145,8 +145,8 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
 
                 <h4
                   className={`max-w-[520px] text-[20px] font-black leading-[1.02] tracking-tight transition-all duration-500 md:text-[28px] xl:text-[32px] ${activeMilestone === index
-                      ? "translate-x-3 text-white"
-                      : "text-white/40 group-hover:text-white/60"
+                    ? "translate-x-3 text-white"
+                    : "text-white/40 group-hover:text-white/60"
                     }`}
                 >
                   {item.title}
@@ -155,8 +155,8 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
 
               <div
                 className={`max-w-[500px] overflow-hidden transition-all duration-700 ease-out ${activeMilestone === index
-                    ? "mt-5 max-h-[220px] translate-x-3 opacity-100"
-                    : "max-h-0 translate-x-0 opacity-0"
+                  ? "mt-5 max-h-[220px] translate-x-3 opacity-100"
+                  : "max-h-0 translate-x-0 opacity-0"
                   }`}
               >
                 <p className="text-[14px] leading-relaxed text-white/50 md:text-[15px]">
@@ -183,8 +183,8 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
               <div
                 key={index}
                 className={`absolute inset-0 transition-all duration-1000 ${activeMilestone === index
-                    ? "translate-y-0 scale-100 opacity-100"
-                    : "translate-y-8 scale-[1.06] opacity-0"
+                  ? "translate-y-0 scale-100 opacity-100"
+                  : "translate-y-8 scale-[1.06] opacity-0"
                   }`}
               >
                 <Image
@@ -215,7 +215,22 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
 }
 
 export default function AboutPage() {
-  useGsapAnimations();
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".hero-fade",
+        { opacity: 0, y: 28 },
+        { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: "power3.out" }
+      );
+      gsap.fromTo(
+        ".card-fade",
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.15 }
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <div className="flex flex-col bg-neutral-950 text-white">
@@ -312,10 +327,6 @@ export default function AboutPage() {
             Here&apos;s what we&apos;ve accomplished together so far:
           </h3>
         </section>
-
-        <div className="my-10 md:my-14">
-          <SectionDivider />
-        </div>
 
         {/* Timeline Section */}
         <MilestoneGallery milestones={milestones} />

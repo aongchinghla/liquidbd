@@ -12,7 +12,6 @@ interface NavbarProps {
   setIsMenuOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
   isLoggedIn: boolean;
   currentUser: string;
-  openAuth: (mode: "login" | "signup") => void;
   handleLogout: () => void;
   cartCount: number;
   setIsCartOpen: (open: boolean) => void;
@@ -23,7 +22,6 @@ export default function Navbar({
   setIsMenuOpen,
   isLoggedIn,
   currentUser,
-  openAuth,
   handleLogout,
   cartCount,
   setIsCartOpen,
@@ -171,12 +169,12 @@ export default function Navbar({
                 </div>
               ) : (
                 <div className="hidden items-center gap-2 md:flex">
-                  <button onClick={() => openAuth("login")} className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/75 transition hover:border-white/25 hover:text-white">
+                  <Link href="/login" className="rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/75 transition hover:border-white/25 hover:text-white">
                     Login
-                  </button>
-                  <button onClick={() => openAuth("signup")} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/90 transition hover:bg-white/[0.08]">
+                  </Link>
+                  <Link href="/login?mode=signup" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/90 transition hover:bg-white/[0.08]">
                     <User className="h-4 w-4" /> Sign Up
-                  </button>
+                  </Link>
                 </div>
               )}
 
@@ -299,8 +297,8 @@ export default function Navbar({
 
               {!isLoggedIn ? (
                 <div className="flex flex-col gap-5 pt-2">
-                  <button onClick={() => { openAuth("login"); setIsMenuOpen(false); }} className="text-left">Login</button>
-                  <button onClick={() => { openAuth("signup"); setIsMenuOpen(false); }} className="text-left text-white font-bold">Sign Up</button>
+                  <Link href="/login" onClick={() => setIsMenuOpen(false)} className="text-left text-white/60 transition hover:text-white">Login</Link>
+                  <Link href="/login?mode=signup" onClick={() => setIsMenuOpen(false)} className="text-left font-bold text-white transition hover:opacity-80">Sign Up</Link>
                 </div>
               ) : (
                 <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="text-left text-red-400">Logout ({currentUser})</button>

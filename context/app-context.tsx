@@ -3,22 +3,20 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Product } from "@/lib/products";
 import { CartItem } from "@/components/modals/cart-drawer";
-import { AuthForm } from "@/components/modals/auth-modal";
 import { CheckoutForm } from "@/components/modals/checkout-modal";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import CartDrawer from "@/components/modals/cart-drawer";
 import CheckoutModal from "@/components/modals/checkout-modal";
-import AuthModal from "@/components/modals/auth-modal";
 
 interface AppContextType {
   cart: CartItem[];
   isLoggedIn: boolean;
+  setIsLoggedIn: (value: boolean) => void;
   currentUser: string;
+  setCurrentUser: (name: string) => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
-  isAuthOpen: boolean;
-  setIsAuthOpen: (open: boolean) => void;
   isCheckoutOpen: boolean;
   setIsCheckoutOpen: (open: boolean) => void;
   isMenuOpen: boolean;
@@ -27,12 +25,6 @@ interface AppContextType {
   removeFromCart: (cartItemId: string) => void;
   updateCartQuantity: (cartItemId: string, delta: number) => void;
   handleLogout: () => void;
-  authMode: "login" | "signup";
-  setAuthMode: (mode: "login" | "signup") => void;
-  authError: string;
-  authForm: AuthForm;
-  handleAuthInput: (field: keyof AuthForm, value: string) => void;
-  handleAuthSubmit: () => void;
   checkoutForm: CheckoutForm;
   handleCheckoutInput: (field: keyof CheckoutForm, value: string) => void;
   handleCheckoutSave: () => void;
@@ -44,12 +36,23 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 function mergeCartItem(prev: CartItem[], product: Product, color?: string, size?: string) {
   const cartItemId = `${product.id}-${color || ""}-${size || ""}`;
   const existing = prev.find((item) => item.cartItemId === cartItemId);
+
   if (existing) {
     return prev.map((item) =>
       item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
     );
   }
-  return [...prev, { ...product, cartItemId, quantity: 1, selectedColor: color, selectedSize: size }];
+
+  return [
+    ...prev,
+    {
+      ...product,
+      cartItemId,
+      quantity: 1,
+      selectedColor: color,
+      selectedSize: size,
+    },
+  ];
 }
 
 function changeQuantity(prev: CartItem[], cartItemId: string, delta: number) {
@@ -62,6 +65,7 @@ function changeQuantity(prev: CartItem[], cartItemId: string, delta: number) {
 
 function RootShell({ children }: { children: React.ReactNode }) {
   const context = useContext(AppContext);
+
   if (context === undefined) {
     throw new Error("useAppContext must be used within an AppProvider");
   }
@@ -70,11 +74,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
     isMenuOpen,
     setIsMenuOpen,
     isLoggedIn,
+    setIsLoggedIn,
     currentUser,
+    setCurrentUser,
     isCartOpen,
     setIsCartOpen,
-    isAuthOpen,
-    setIsAuthOpen,
     isCheckoutOpen,
     setIsCheckoutOpen,
     cart,
@@ -84,12 +88,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
     checkoutForm,
     handleCheckoutInput,
     handleCheckoutSave,
-    authMode,
-    setAuthMode,
-    authForm,
-    authError,
-    handleAuthInput,
-    handleAuthSubmit,
     handleLogout,
   } = context;
 
@@ -102,10 +100,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
         setIsMenuOpen={setIsMenuOpen}
         isLoggedIn={isLoggedIn}
         currentUser={currentUser}
-        openAuth={(mode) => {
-          setAuthMode(mode);
-          setIsAuthOpen(true);
-        }}
         handleLogout={handleLogout}
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
         setIsCartOpen={setIsCartOpen}
@@ -135,18 +129,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
           setIsCheckoutOpen={setIsCheckoutOpen}
         />
       )}
-
-      {isAuthOpen && (
-        <AuthModal
-          authMode={authMode}
-          setAuthMode={setAuthMode}
-          authForm={authForm}
-          authError={authError}
-          handleAuthInput={handleAuthInput}
-          handleAuthSubmit={handleAuthSubmit}
-          setIsAuthOpen={setIsAuthOpen}
-        />
-      )}
     </div>
   );
 }
@@ -154,18 +136,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState("Guest");
-  const [authError, setAuthError] = useState("");
-  const [authForm, setAuthForm] = useState<AuthForm>({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-  });
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>({
     name: "",
     phone: "",
@@ -181,6 +154,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedCheckout) setCheckoutForm(JSON.parse(savedCheckout));
+
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
         setIsLoggedIn(Boolean(parsed?.isLoggedIn));
@@ -194,7 +168,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem("liquid-cart", JSON.stringify(cart));
   }, [cart]);
-
 
   useEffect(() => {
     localStorage.setItem("liquid-checkout", JSON.stringify(checkoutForm));
@@ -218,57 +191,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => changeQuantity(prev, cartItemId, delta));
   };
 
-
-  const handleAuthInput = (field: keyof AuthForm, value: string) => {
-    setAuthForm((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleCheckoutInput = (field: keyof CheckoutForm, value: string) => {
     setCheckoutForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const resetAuthForm = () => {
-    setAuthForm({ name: "", email: "", password: "", phone: "" });
-  };
-
-  const handleAuthSubmit = () => {
-    setAuthError("");
-
-    if (!authForm.email || !authForm.password) {
-      setAuthError("Email and password are required.");
-      return;
-    }
-
-    if (authMode === "signup") {
-      if (!authForm.name || !authForm.phone) {
-        setAuthError("Name and phone number are required for sign up.");
-        return;
-      }
-
-      if (authForm.password.length < 6) {
-        setAuthError("Password must be at least 6 characters.");
-        return;
-      }
-
-      const user = { isLoggedIn: true, name: authForm.name };
-      localStorage.setItem("liquid-user", JSON.stringify(user));
-      setCurrentUser(authForm.name);
-      setIsLoggedIn(true);
-      setIsAuthOpen(false);
-      resetAuthForm();
-      return;
-    }
-
-    const user = {
-      isLoggedIn: true,
-      name: authForm.email.split("@")[0] || "Customer",
-    };
-
-    localStorage.setItem("liquid-user", JSON.stringify(user));
-    setCurrentUser(user.name);
-    setIsLoggedIn(true);
-    setIsAuthOpen(false);
-    resetAuthForm();
   };
 
   const handleLogout = () => {
@@ -282,14 +206,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsCheckoutOpen(false);
   };
 
-  const value = {
+  const value: AppContextType = {
     cart,
     isLoggedIn,
+    setIsLoggedIn,
     currentUser,
+    setCurrentUser,
     isCartOpen,
     setIsCartOpen,
-    isAuthOpen,
-    setIsAuthOpen,
     isCheckoutOpen,
     setIsCheckoutOpen,
     isMenuOpen,
@@ -298,12 +222,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     removeFromCart,
     updateCartQuantity,
     handleLogout,
-    authMode,
-    setAuthMode,
-    authError,
-    authForm,
-    handleAuthInput,
-    handleAuthSubmit,
     checkoutForm,
     handleCheckoutInput,
     handleCheckoutSave,
@@ -319,8 +237,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
 export function useAppContext() {
   const context = useContext(AppContext);
+
   if (context === undefined) {
     throw new Error("useAppContext must be used within an AppProvider");
   }
+
   return context;
 }
