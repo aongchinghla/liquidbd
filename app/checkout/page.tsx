@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BadgeInfo,
@@ -53,6 +53,7 @@ export default function CheckoutPage() {
     nagadSenderLast4: string;
     nagadTransactionId: string;
   } | null>(null);
+  const successSectionRef = useRef<HTMLDivElement>(null);
   const deliveryCharge = subtotal > 0 ? 80 : 0;
   const promo = calculatePromoDiscount(subtotal, checkoutForm.promoCode);
   const total = Math.max(subtotal + deliveryCharge - promo.discount, 0);
@@ -76,6 +77,22 @@ export default function CheckoutPage() {
   useEffect(() => {
     setIsCartOpen(false);
   }, [setIsCartOpen]);
+
+  useEffect(() => {
+    if (!orderSuccess || typeof window === "undefined") return;
+
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+    if (!isMobileViewport) return;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const timer = window.setTimeout(() => {
+      successSectionRef.current?.focus();
+      successSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 220);
+
+    return () => window.clearTimeout(timer);
+  }, [orderSuccess]);
 
   const onPlaceOrder = () => {
     setError("");
@@ -137,6 +154,8 @@ export default function CheckoutPage() {
       nagadSenderLast4: checkoutForm.nagadSenderLast4,
       nagadTransactionId: checkoutForm.nagadTransactionId,
     });
+    // Clear the promo code after order is placed
+    handleCheckoutInput("promoCode", "");
   };
 
   return (
@@ -165,10 +184,12 @@ export default function CheckoutPage() {
             <p className="mt-3 text-sm text-white/55">Bringing your saved cart and delivery info into place.</p>
           </div>
         ) : orderSuccess ? (
-          <div className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-2xl shadow-black/20 md:p-5">
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] px-6 py-8 text-center md:px-8 md:py-10">
-              <div className="pointer-events-none absolute -left-12 top-0 h-32 w-32 rounded-full bg-emerald-400/10 blur-3xl" />
-              <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-28 rounded-full bg-white/5 blur-3xl" />
+          <div
+            ref={successSectionRef}
+            tabIndex={-1}
+            className="mx-auto max-w-2xl focus:outline-none"
+          >
+            <div className="px-6 py-8 text-center md:px-8 md:py-10">
               <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-emerald-300/25 bg-emerald-400/10 text-emerald-300 shadow-[0_18px_40px_rgba(16,185,129,0.12)] ring-1 ring-emerald-200/10">
                 <CheckCircle2 className="h-9 w-9" />
               </div>
@@ -544,6 +565,14 @@ export default function CheckoutPage() {
                       placeholder="Enter promo code"
                       className="h-11 flex-1 rounded-xl border border-white/10 bg-black/30 px-4 text-sm uppercase tracking-[0.12em] text-white placeholder:normal-case placeholder:tracking-normal placeholder:text-white/30 outline-none transition focus:border-white/25"
                     />
+                    {checkoutForm.promoCode && (
+                      <button
+                        onClick={() => handleCheckoutInput("promoCode", "")}
+                        className="h-11 rounded-xl border border-white/10 bg-black/30 px-4 text-xs font-medium text-white/60 transition hover:border-white/25 hover:text-white"
+                      >
+                        Clear
+                      </button>
+                    )}
                   </div>
                   <p className="mt-3 text-xs text-white/40">Use `LIQUID10` for 10% off on your subtotal.</p>
                   {isPromoApplied && (

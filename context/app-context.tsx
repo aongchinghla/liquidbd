@@ -33,6 +33,16 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+function getPersistedCheckoutForm(checkoutForm: CheckoutForm) {
+  return {
+    name: checkoutForm.name,
+    email: checkoutForm.email,
+    phone: checkoutForm.phone,
+    address: checkoutForm.address,
+    promoCode: checkoutForm.promoCode,
+  };
+}
+
 function mergeCartItem(prev: CartItem[], product: Product, color?: string, size?: string) {
   const cartItemId = `${product.id}-${color || ""}-${size || ""}`;
   const existing = prev.find((item) => item.cartItemId === cartItemId);
@@ -143,7 +153,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedCheckout) {
-        setCheckoutForm((prev) => ({ ...prev, ...JSON.parse(savedCheckout) }));
+        const parsedCheckout = JSON.parse(savedCheckout);
+        setCheckoutForm((prev) => ({
+          ...prev,
+          ...parsedCheckout,
+          paymentMethod: "Cash on Delivery",
+          bkashSenderLast4: "",
+          bkashTransactionId: "",
+          nagadSenderLast4: "",
+          nagadTransactionId: "",
+        }));
       }
 
       if (savedUser) {
@@ -163,7 +182,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem("liquid-checkout", JSON.stringify(checkoutForm));
+    localStorage.setItem("liquid-checkout", JSON.stringify(getPersistedCheckoutForm(checkoutForm)));
   }, [checkoutForm]);
 
   const subtotal = useMemo(
@@ -213,7 +232,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleCheckoutInput = (field: keyof CheckoutForm, value: string) => {
-    setCheckoutForm((prev) => ({ ...prev, [field]: value }));
+    setCheckoutForm((prev) => {
+      if (field === "paymentMethod") {
+        return {
+          ...prev,
+          paymentMethod: value,
+          bkashSenderLast4: "",
+          bkashTransactionId: "",
+          nagadSenderLast4: "",
+          nagadTransactionId: "",
+        };
+      }
+
+      return { ...prev, [field]: value };
+    });
   };
 
   const handleLogout = () => {
@@ -223,7 +255,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleCheckoutSave = () => {
-    localStorage.setItem("liquid-checkout", JSON.stringify(checkoutForm));
+    localStorage.setItem("liquid-checkout", JSON.stringify(getPersistedCheckoutForm(checkoutForm)));
   };
 
   const value: AppContextType = {

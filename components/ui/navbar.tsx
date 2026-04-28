@@ -111,8 +111,17 @@ export default function Navbar({
                   placeholder="Search products, type, or category..."
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
-                  className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-4 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
+                  className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-11 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
                 />
+                {searchQuery.trim().length > 0 && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/35 transition hover:text-white"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
               {searchQuery.trim().length > 0 && (
@@ -134,7 +143,7 @@ export default function Navbar({
                     href={link.href}
                     className={`rounded-full px-3 py-1.5 text-sm transition ${
                       getIsActive(link.href)
-                        ? "bg-[#2f7ea1] text-white"
+                        ? "bg-sky-600 text-white"
                         : "text-white/70 hover:bg-white/[0.05] hover:text-white"
                     }`}
                   >
@@ -154,7 +163,7 @@ export default function Navbar({
               ) : (
                 <Link
                   href="/login"
-                  className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-white/20 hover:text-white md:inline-flex"
+                  className="hidden items-center gap-2 rounded-full border border-[#2f7ea1]/60 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-[#2f7ea1] hover:text-white md:inline-flex"
                 >
                   <User className="h-4 w-4" />
                   Login
@@ -176,7 +185,7 @@ export default function Navbar({
 
               <button
                 onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="-mr-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05] lg:hidden"
+                className="-mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05] lg:hidden"
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
               >
@@ -193,8 +202,17 @@ export default function Navbar({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-4 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
+                className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-11 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
               />
+              {searchQuery.trim().length > 0 && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/35 transition hover:text-white"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
 
             {searchQuery.trim().length > 0 && (
@@ -242,7 +260,7 @@ export default function Navbar({
                     onClick={closeAll}
                     className={`flex items-center rounded-xl px-4 py-3 text-sm transition ${
                       getIsActive(link.href)
-                        ? "bg-[#2f7ea1] text-white"
+                        ? "bg-sky-600 text-white"
                         : "text-white/75 hover:bg-white/[0.05] hover:text-white"
                     }`}
                   >
@@ -285,7 +303,7 @@ export default function Navbar({
                   <Link
                     href="/login"
                     onClick={closeAll}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+                    className="flex items-center gap-3 rounded-xl border border-[#2f7ea1]/45 px-4 py-3 text-sm text-white/75 transition hover:border-[#2f7ea1] hover:bg-white/[0.05] hover:text-white"
                   >
                     <User className="h-4 w-4 shrink-0" />
                     Login

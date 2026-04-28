@@ -63,7 +63,7 @@ export default function ProductCard({
         <button
           type="button"
           onClick={() => addToCart(product)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white/[0.05] border border-white/10 px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-white hover:text-black active:scale-95"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#2f7ea1]/60 bg-white/[0.05] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:border-[#2f7ea1] hover:bg-white hover:text-black active:scale-95"
         >
           <ShoppingBag className="h-4 w-4" />
           Quick Add

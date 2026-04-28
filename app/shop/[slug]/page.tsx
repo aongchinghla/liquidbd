@@ -214,8 +214,8 @@ export default function ProductDetailsPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center pt-2">
-              <div className="flex h-11 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-2 sm:w-32">
+            <div className="flex items-center gap-3 pt-2 sm:gap-4">
+              <div className="flex h-11 w-[124px] shrink-0 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-2 sm:w-32">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-white/5 active:scale-90"
@@ -234,7 +234,7 @@ export default function ProductDetailsPage() {
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className={`group relative flex h-11 flex-1 items-center justify-center overflow-hidden rounded-xl font-bold transition-all active:scale-[0.98] ${isAdding ? "bg-white/10 text-white/40 cursor-wait" : "bg-white text-black hover:bg-neutral-200"
+                className={`group relative flex h-11 min-w-0 flex-1 items-center justify-center overflow-hidden rounded-xl px-4 font-bold transition-all active:scale-[0.98] ${isAdding ? "bg-white/10 text-white/40 cursor-wait" : "bg-white text-black hover:bg-neutral-200"
                   }`}
               >
                 <div className="relative z-10 flex items-center gap-2 text-xs uppercase tracking-widest">

@@ -72,28 +72,34 @@ function LoginContent() {
 
     if (!card) return;
 
-    gsap.set([card, ...elements], { opacity: 0, y: 20 });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set([card, ...elements], { opacity: 1, y: 0 });
+      return;
+    }
 
-    const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.8 } });
+    gsap.set(card, { opacity: 0 });
+    gsap.set(elements, { opacity: 0 });
 
-    tl.to(card, { opacity: 1, y: 0 });
+    const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+    tl.to(card, { opacity: 1, duration: 0.45 });
 
     if (elements.length > 0) {
       tl.to(
         elements,
         {
           opacity: 1,
-          y: 0,
-          stagger: 0.08,
+          duration: 0.25,
+          stagger: 0.03,
         },
-        "-=0.4"
+        "-=0.2"
       );
     }
 
     return () => {
       tl.kill();
     };
-  }, [authMode]);
+  }, []);
 
   const addToRefs = (el: HTMLElement | null) => {
     if (el && !elementsRef.current.includes(el)) {

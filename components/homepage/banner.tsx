@@ -33,7 +33,7 @@ export default function IndigenousBanner() {
               <div className="mt-6">
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center rounded-md bg-[#1e6a8d] px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-[#154d66] active:scale-95"
+                  className="inline-flex items-center justify-center rounded-md bg-[#2f7ea1] px-6 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-[#286d8b] active:scale-95"
                 >
                   Shop with Purpose
                 </Link>

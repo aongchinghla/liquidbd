@@ -56,7 +56,7 @@ export default function Newsletter() {
         className="pointer-events-none absolute bottom-0 left-1/2 w-[300px] -translate-x-1/2 object-contain opacity-15 blur-[1px] sm:w-[500px] md:w-[700px]"
       />
 
-      <div className="relative z-10 card-fade mb-10 rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-10 text-center backdrop-blur-sm md:mb-16 md:px-10 md:py-14">
+      <div className="relative z-10 card-fade mb-10 rounded-[1.125rem] border border-white/10 bg-white/[0.03] px-6 py-10 text-center backdrop-blur-sm md:mb-16 md:px-10 md:py-14">
         <p className="text-xs uppercase tracking-[0.35em] text-white/45">
           Join The Liquid Family
         </p>
@@ -71,7 +71,7 @@ export default function Newsletter() {
 
         <form
           onSubmit={handleSubmit}
-          className="mx-auto mt-8 max-w-md"
+          className="mx-auto mt-8 max-w-lg"
         >
           <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/40 p-2 sm:flex-row sm:items-center sm:rounded-full sm:gap-2">
             <input
@@ -79,7 +79,7 @@ export default function Newsletter() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Enter your email"
-              className="h-10 flex-1 rounded-xl bg-transparent px-5 text-sm text-white placeholder:text-white/35 outline-none sm:h-11 sm:rounded-full"
+              className="h-12 flex-1 rounded-xl bg-transparent px-5 text-base text-white placeholder:text-base placeholder:text-white/45 outline-none sm:h-11 sm:rounded-full"
             />
             <button
               type="submit"

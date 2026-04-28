@@ -47,7 +47,7 @@ export default function Footer() {
               <h3 className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/35">
                 Shop
               </h3>
-              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3 sm:flex-col sm:gap-x-0">
+              <div className="mt-5 flex flex-col gap-3">
                 {shopLinks.map((link) => (
                   <Link
                     key={link.label}
@@ -64,7 +64,7 @@ export default function Footer() {
               <h3 className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/35">
                 Company
               </h3>
-              <div className="mt-5 flex flex-wrap gap-x-5 gap-y-3 sm:flex-col sm:gap-x-0">
+              <div className="mt-5 flex flex-col gap-3">
                 {companyLinks.map((link) => (
                   <Link
                     key={link.label}
