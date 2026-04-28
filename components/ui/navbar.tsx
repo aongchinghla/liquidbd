@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut, MapPin, MapPinned, Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { LogOut, MapPinned, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { products, Product } from "@/lib/products";
 
 interface NavbarProps {
@@ -17,6 +17,12 @@ interface NavbarProps {
   setIsCartOpen: (open: boolean) => void;
 }
 
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/shop" },
+  { label: "About Us", href: "/about" },
+];
+
 export default function Navbar({
   isMenuOpen,
   setIsMenuOpen,
@@ -27,12 +33,9 @@ export default function Navbar({
   setIsCartOpen,
 }: NavbarProps) {
   const pathname = usePathname();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const searchRef = useRef<HTMLDivElement>(null);
-  const accountRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -40,359 +43,307 @@ export default function Navbar({
       return;
     }
 
-    const filtered = products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.productType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.tag && product.tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    ).slice(0, 5); // Limit to top 5 results
+    const nextResults = products
+      .filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.productType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (product.tag && product.tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+      .slice(0, 5);
 
-    setSearchResults(filtered);
+    setSearchResults(nextResults);
   }, [searchQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-      }
-      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
-        setIsAccountOpen(false);
+      if (shellRef.current && !shellRef.current.contains(event.target as Node)) {
+        setSearchQuery("");
+        setIsMenuOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [setIsMenuOpen]);
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsSearchOpen(false);
-        setIsAccountOpen(false);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSearchQuery("");
+        setIsMenuOpen(false);
       }
     };
+
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
+  }, [setIsMenuOpen]);
 
-  const onLogout = () => {
-    handleLogout();
-    setIsAccountOpen(false);
+  const closeAll = () => {
+    setSearchQuery("");
     setIsMenuOpen(false);
   };
 
+  const getIsActive = (href: string) =>
+    href === "/shop" ? pathname === "/shop" || pathname.startsWith("/shop/") : pathname === href;
+
   return (
-    <>
-      <div className="relative z-[60] border-b border-white/10 bg-black/70 backdrop-blur-xl">
-        <div className="site-shell flex flex-row items-center justify-between py-3 text-[10px] text-white/60 md:text-xs">
-          <div className="flex items-center">
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" /> Dhaka, Bangladesh
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>bKash</span>
-            <span>Nagad</span>
-            <span className="font-medium text-white/80">COD</span>
-          </div>
-        </div>
-      </div>
-
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/75 backdrop-blur-2xl">
-        <div className="site-shell flex items-center justify-between py-4">
-          <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] md:hidden"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
-            </button>
-
-            <Link href="/" className="flex items-center">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#242424]/95 backdrop-blur-2xl">
+      <div ref={shellRef} className="site-shell relative px-2.5 py-2 sm:px-3 md:px-5 lg:px-6">
+        <div className="grid gap-2">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 lg:grid-cols-[auto_minmax(360px,620px)_auto] lg:justify-between">
+            <Link href="/" onClick={closeAll} className="flex items-center justify-center px-1 py-1">
               <Image
                 src="/liquid-logo.png"
                 alt="Liquid T-Shirt Logo"
-                width={85}
-                height={28}
-                className="w-[70px] object-contain md:w-[90px]"
+                width={100}
+                height={32}
+                className="h-auto w-[74px] object-contain md:w-[92px]"
                 priority
               />
             </Link>
-          </div>
 
-          <div className="flex items-center justify-self-end">
+            <div className="relative mx-auto hidden w-full lg:block">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+                <input
+                  type="text"
+                  placeholder="Search products, type, or category..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-4 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
+                />
+              </div>
 
-            <nav className="hidden items-center gap-8 pr-8 text-base text-white/70 md:flex">
-              <Link
-                href="/"
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/" ? "text-white after:w-full" : "after:w-0"
-                  }`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/shop"
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/shop" || pathname.startsWith("/shop/") ? "text-white after:w-full" : "after:w-0"
-                  }`}
-              >
-                Shop
-              </Link>
-              <Link
-                href="/about"
-                className={`relative pb-1 transition duration-300 hover:text-white after:absolute after:left-0 after:bottom-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 hover:after:w-full ${pathname === "/about" ? "text-white after:w-full" : "after:w-0"
-                  }`}
-              >
-                About Us
-              </Link>
-            </nav>
+              {searchQuery.trim().length > 0 && (
+                <div className="absolute left-0 right-0 top-[calc(100%+0.6rem)] z-[70]">
+                  <SearchResults
+                    results={searchResults}
+                    searchQuery={searchQuery}
+                    closeAll={closeAll}
+                  />
+                </div>
+              )}
+            </div>
 
-            <div className="flex items-center gap-2 md:gap-3">
-              <button
-                onClick={() => {
-                  setIsSearchOpen(!isSearchOpen);
-                  if (isSearchOpen) setSearchQuery("");
-                }}
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition-all duration-300 md:h-11 md:w-11 ${isSearchOpen ? "bg-white text-black shadow-[0_10px_30px_rgba(255,255,255,0.12)]" : "bg-white/[0.03] text-white/70 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
-                  }`}
-              >
-                {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-              </button>
+            <div className="flex items-center justify-self-end gap-2">
+              <nav className="hidden items-center gap-2 lg:flex">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`rounded-full px-3 py-1.5 text-sm transition ${
+                      getIsActive(link.href)
+                        ? "bg-[#2f7ea1] text-white"
+                        : "text-white/70 hover:bg-white/[0.05] hover:text-white"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
 
               {isLoggedIn ? (
-                <div ref={accountRef} className="relative hidden md:block">
-                  <button
-                    onClick={() => setIsAccountOpen((prev) => !prev)}
-                    className="inline-flex h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-sm text-white/90 transition hover:bg-white/[0.08]"
-                    aria-expanded={isAccountOpen}
-                    aria-haspopup="menu"
-                  >
-                    <User className="h-4 w-4" />
-                    <span className="max-w-[130px] truncate">Hi, {currentUser}</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${isAccountOpen ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {isAccountOpen && (
-                    <div className="absolute right-0 top-[calc(100%+0.75rem)] w-56 overflow-hidden rounded-xl border border-white/10 bg-neutral-950/95 py-2 shadow-2xl backdrop-blur-xl">
-                      <div className="border-b border-white/10 px-4 py-3">
-                        <p className="text-xs uppercase tracking-widest text-white/35">Signed in as</p>
-                        <p className="mt-1 truncate text-sm font-medium text-white">{currentUser}</p>
-                      </div>
-                      <Link
-                        href="/login?view=profile"
-                        onClick={() => setIsAccountOpen(false)}
-                        className="flex items-center gap-2 px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.06] hover:text-white"
-                        role="menuitem"
-                      >
-                        <User className="h-4 w-4" />
-                        My Profile
-                      </Link>
-                      <Link
-                        href="/login?view=address"
-                        onClick={() => setIsAccountOpen(false)}
-                        className="flex items-center gap-2 px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.06] hover:text-white"
-                        role="menuitem"
-                      >
-                        <MapPinned className="h-4 w-4" />
-                        Address
-                      </Link>
-                      <button
-                        onClick={onLogout}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.06] hover:text-red-200"
-                        role="menuitem"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <Link
+                  href="/login?view=profile"
+                  className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-white/20 hover:text-white md:inline-flex"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="max-w-[120px] truncate">{currentUser}</span>
+                </Link>
               ) : (
-                <div className="hidden items-center gap-2 md:flex">
-                  <Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/90 transition hover:bg-white/[0.08]">
-                    <User className="h-4 w-4" />
-                    Login
-                  </Link>
-                </div>
+                <Link
+                  href="/login"
+                  className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-white/20 hover:text-white md:inline-flex"
+                >
+                  <User className="h-4 w-4" />
+                  Login
+                </Link>
               )}
 
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 md:px-4 md:py-2.5 text-sm font-bold text-black transition hover:opacity-90 active:scale-95"
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white text-black transition hover:opacity-90"
+                aria-label="Open cart"
               >
                 <ShoppingBag className="h-4 w-4" />
-                <span className="hidden md:inline">Cart</span>
-                <span>({cartCount})</span>
+                {cartCount > 0 && (
+                  <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-[#242424] bg-red-500 px-1 text-[9px] font-bold leading-none text-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+                className="-mr-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05] lg:hidden"
+                aria-label="Toggle menu"
+                aria-expanded={isMenuOpen}
+              >
+                {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </button>
             </div>
           </div>
-        </div>
 
-        <div
-          ref={searchRef}
-          className={`absolute left-0 top-full w-full border-b border-white/10 bg-neutral-950/92 px-4 py-6 backdrop-blur-3xl transition-all duration-300 ease-in-out md:px-5 lg:px-6 ${isSearchOpen
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 -translate-y-4 pointer-events-none"
-            }`}
-        >
-          <div className="mx-auto max-w-[800px] relative">
-            <div className="relative group">
+          <div className="relative lg:hidden">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
               <input
                 type="text"
-                placeholder="Search products, brands, or categories..."
+                placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus={isSearchOpen}
-                className="w-full rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.04))] py-4 pl-14 pr-6 text-lg text-white shadow-[0_18px_50px_rgba(0,0,0,0.28)] placeholder:text-white/28 transition-all duration-300 focus:border-white/25 focus:bg-white/[0.08] focus:outline-none"
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-4 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
               />
-              <Search className="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-white/35 transition-all duration-300 group-focus-within:text-white/80" />
             </div>
 
-            {searchResults.length > 0 && (
-              <div className="absolute left-0 top-full z-[110] mt-3 w-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-neutral-900/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-                {searchResults.map((product) => (
+            {searchQuery.trim().length > 0 && (
+              <div className="absolute left-0 right-0 top-[calc(100%+0.6rem)] z-[70]">
+                <SearchResults
+                  results={searchResults}
+                  searchQuery={searchQuery}
+                  closeAll={closeAll}
+                />
+              </div>
+            )}
+          </div>
+
+          {isLoggedIn && (
+            <div className="hidden items-center justify-end gap-2 border-t border-white/10 pt-2 md:flex lg:hidden">
+              <Link
+                href="/login?view=address"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/55 transition hover:border-white/20 hover:text-white"
+              >
+                <MapPinned className="h-3.5 w-3.5" />
+                Address
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-red-300 transition hover:border-white/20 hover:text-red-200"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Logout
+              </button>
+            </div>
+          )}
+
+          {isMenuOpen && (
+            <div
+              className="absolute left-2.5 right-2.5 top-full z-[80] mt-2 overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#151515] shadow-[0_24px_60px_rgba(0,0,0,0.45)] lg:hidden"
+              aria-label="Navigation menu"
+              role="dialog"
+              aria-modal="true"
+            >
+              <div className="grid gap-1 p-2">
+                {navLinks.map((link) => (
                   <Link
-                    key={product.id}
-                    href={`/shop/${product.slug}`}
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchQuery("");
-                    }}
-                    className="group flex items-center gap-4 border-b border-white/[0.06] p-4 transition-colors hover:bg-white/[0.05] last:border-0"
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeAll}
+                    className={`flex items-center rounded-xl px-4 py-3 text-sm transition ${
+                      getIsActive(link.href)
+                        ? "bg-[#2f7ea1] text-white"
+                        : "text-white/75 hover:bg-white/[0.05] hover:text-white"
+                    }`}
                   >
-                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-white/8 bg-white/[0.04]">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                        sizes="48px"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="truncate font-medium text-white transition-colors group-hover:text-white/90">{product.name}</h4>
-                      <p className="text-sm text-white/40">
-                        {product.productType}
-                        {product.category ? ` · ${product.category}` : ""}
-                      </p>
-                    </div>
-                    <div className="font-semibold text-white/85 transition-colors group-hover:text-white">
-                      ৳{product.price}
-                    </div>
+                    {link.label}
                   </Link>
                 ))}
-                <Link
-                  href="/shop"
-                  onClick={() => setIsSearchOpen(false)}
-                  className="block py-3 text-center text-sm text-white/60 transition-colors hover:bg-white/[0.05] hover:text-white"
-                >
-                  View all products
-                </Link>
-              </div>
-            )}
 
-            {searchQuery.trim().length > 0 && searchResults.length === 0 && (
-              <div className="absolute left-0 top-full mt-3 w-full rounded-[1.5rem] border border-white/10 bg-neutral-900/95 p-8 text-center text-white/40 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-                No products found for "{searchQuery}"
-              </div>
-            )}
-          </div>
-        </div>
+                <div className="my-2 border-t border-white/[0.07]" />
 
-        {isMenuOpen && (
-          <div className="absolute left-0 top-full z-[100] w-full border-b border-white/10 bg-neutral-950/95 px-6 py-6 shadow-2xl backdrop-blur-xl md:hidden">
-            <div className="flex flex-col gap-6 text-base font-medium text-white/75">
-              <Link
-                href="/"
-                onClick={() => setIsMenuOpen(false)}
-                className={`transition-colors ${pathname === "/" ? "text-white font-bold" : "text-white/60"}`}
-              >
-                Home
-              </Link>
-              <Link
-                href="/shop"
-                onClick={() => setIsMenuOpen(false)}
-                className={`transition-colors ${pathname === "/shop" || pathname.startsWith("/shop/") ? "text-white font-bold" : "text-white/60"}`}
-              >
-                Shop
-              </Link>
-              <Link
-                href="/about"
-                onClick={() => setIsMenuOpen(false)}
-                className={`transition-colors ${pathname === "/about" ? "text-white font-bold" : "text-white/60"}`}
-              >
-                About Us
-              </Link>
-
-              <div className="h-[1px] w-full bg-white/10" />
-
-              {!isLoggedIn ? (
-                <div className="flex flex-col gap-5 pt-2">
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      href="/login?view=profile"
+                      onClick={closeAll}
+                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+                    >
+                      <User className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{currentUser}</span>
+                    </Link>
+                    <Link
+                      href="/login?view=address"
+                      onClick={closeAll}
+                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+                    >
+                      <MapPinned className="h-4 w-4 shrink-0" />
+                      Address
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        closeAll();
+                      }}
+                      className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.05] hover:text-red-200"
+                    >
+                      <LogOut className="h-4 w-4 shrink-0" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
                   <Link
                     href="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="inline-flex items-center gap-2 text-left text-white/75 transition hover:text-white"
+                    onClick={closeAll}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
                   >
-                    <User className="h-4 w-4" />
+                    <User className="h-4 w-4 shrink-0" />
                     Login
                   </Link>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03]">
-                  <button
-                    onClick={() => setIsAccountOpen((prev) => !prev)}
-                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-white/85"
-                    aria-expanded={isAccountOpen}
-                    aria-haspopup="menu"
-                  >
-                    <span className="inline-flex min-w-0 items-center gap-2">
-                      <User className="h-4 w-4 shrink-0" />
-                      <span className="truncate">Hi, {currentUser}</span>
-                    </span>
-                    <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${isAccountOpen ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {isAccountOpen && (
-                    <div className="border-t border-white/10 py-1">
-                      <Link
-                        href="/login?view=profile"
-                        onClick={() => {
-                          setIsAccountOpen(false);
-                          setIsMenuOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-4 py-3 text-left text-white/75"
-                        role="menuitem"
-                      >
-                        <User className="h-4 w-4" />
-                        My Profile
-                      </Link>
-                      <Link
-                        href="/login?view=address"
-                        onClick={() => {
-                          setIsAccountOpen(false);
-                          setIsMenuOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-4 py-3 text-left text-white/75"
-                        role="menuitem"
-                      >
-                        <MapPinned className="h-4 w-4" />
-                        Address
-                      </Link>
-                      <button
-                        onClick={onLogout}
-                        className="flex w-full items-center gap-2 px-4 py-3 text-left text-red-300"
-                        role="menuitem"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function SearchResults({
+  results,
+  searchQuery,
+  closeAll,
+}: {
+  results: Product[];
+  searchQuery: string;
+  closeAll: () => void;
+}) {
+  if (results.length === 0) {
+    return (
+      <p className="rounded-[1.25rem] border border-white/10 bg-[#151515] px-4 py-5 text-sm text-white/40 shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+        No products found for &ldquo;{searchQuery}&rdquo;.
+      </p>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#151515] shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+      {results.map((product) => (
+        <Link
+          key={product.id}
+          href={`/shop/${product.slug}`}
+          onClick={closeAll}
+          className="flex items-center gap-4 border-b border-white/[0.06] p-4 transition hover:bg-white/[0.04] last:border-b-0"
+        >
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="48px"
+            />
           </div>
-        )}
-      </header>
-    </>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-white">{product.name}</p>
+            <p className="mt-1 text-xs text-white/40">
+              {product.productType}
+              {product.category ? ` · ${product.category}` : ""}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }
