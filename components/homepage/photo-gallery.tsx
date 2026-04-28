@@ -14,7 +14,7 @@ const galleryImages = [
 export default function InstagramStyleGallery() {
   return (
     <section className="w-full py-10 lg:py-16">
-      <div className="mx-auto max-w-[1600px] px-4 lg:px-10">
+      <div className="site-shell">
         
         <div className="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-4">
           {galleryImages.map((photo) => (

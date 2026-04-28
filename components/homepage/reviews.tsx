@@ -29,7 +29,7 @@ const reviews = [
 
 export default function Reviews() {
   return (
-    <section id="reviews" className="mx-auto max-w-[1600px] px-6 py-10 lg:px-10 lg:py-14">
+    <section id="reviews" className="site-shell py-10 lg:py-14">
       <div className="mb-8">
         <p className="card-fade text-xs uppercase tracking-[0.35em] text-white/45">Reviews</p>
         <h3 className="card-fade mt-3 text-3xl font-semibold md:text-4xl">What customers are saying</h3>

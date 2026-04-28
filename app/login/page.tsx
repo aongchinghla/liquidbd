@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Mail, Lock, LogIn, User, Phone, Eye, EyeOff } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Mail, Lock, LogIn, User, Phone, Eye, EyeOff, MapPinned, Save } from "lucide-react";
 import { gsap } from "gsap";
 import { useAppContext } from "@/context/app-context";
 
@@ -14,12 +14,22 @@ interface AuthForm {
   phone: string;
 }
 
+interface SavedUser {
+  isLoggedIn?: boolean;
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
 function LoginContent() {
-  const router = useRouter();
   const {
     setIsLoggedIn,
     setCurrentUser,
     isLoggedIn,
+    currentUser,
+    checkoutForm,
+    handleCheckoutInput,
+    handleCheckoutSave,
   } = useAppContext();
 
   const [authMode, setAuthMode] = React.useState<"login" | "signup">("login");
@@ -41,6 +51,11 @@ function LoginContent() {
   const [resetLoading, setResetLoading] = React.useState(false);
   const [resetMessage, setResetMessage] = React.useState("");
   const [resetError, setResetError] = React.useState("");
+  const [profileName, setProfileName] = React.useState("");
+  const [profileEmail, setProfileEmail] = React.useState("");
+  const [profilePhone, setProfilePhone] = React.useState("");
+  const [accountMessage, setAccountMessage] = React.useState("");
+  const accountView = searchParams.get("view") === "address" ? "address" : "profile";
 
   useEffect(() => {
     const mode = searchParams.get("mode");
@@ -52,19 +67,28 @@ function LoginContent() {
   }, [searchParams, setAuthMode]);
 
   useEffect(() => {
-    gsap.set([cardRef.current, ...elementsRef.current], { opacity: 0, y: 20 });
+    const card = cardRef.current;
+    const elements = elementsRef.current.filter((element): element is HTMLElement => Boolean(element));
+
+    if (!card) return;
+
+    gsap.set([card, ...elements], { opacity: 0, y: 20 });
 
     const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 0.8 } });
 
-    tl.to(cardRef.current, { opacity: 1, y: 0 }).to(
-      elementsRef.current,
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.08,
-      },
-      "-=0.4"
-    );
+    tl.to(card, { opacity: 1, y: 0 });
+
+    if (elements.length > 0) {
+      tl.to(
+        elements,
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.08,
+        },
+        "-=0.4"
+      );
+    }
 
     return () => {
       tl.kill();
@@ -79,9 +103,22 @@ function LoginContent() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      router.push("/");
+      try {
+        const savedUser = localStorage.getItem("liquid-user");
+        if (!savedUser) {
+          setProfileName(currentUser === "Guest" ? "" : currentUser);
+          return;
+        }
+
+        const parsed: SavedUser = JSON.parse(savedUser);
+        setProfileName(parsed.name || "");
+        setProfileEmail(parsed.email || "");
+        setProfilePhone(parsed.phone || "");
+      } catch (error) {
+        console.error("Profile load error", error);
+      }
     }
-  }, [isLoggedIn, router]);
+  }, [currentUser, isLoggedIn]);
 
   const handleAuthInput = (field: keyof AuthForm, value: string) => {
     setAuthForm((prev) => ({ ...prev, [field]: value }));
@@ -91,10 +128,12 @@ function LoginContent() {
     setAuthForm({ name: "", email: "", password: "", phone: "" });
   };
 
-  const saveUserSession = (name: string) => {
+  const saveUserSession = (name: string, email = "", phone = "") => {
     const user = {
       isLoggedIn: true,
       name,
+      email,
+      phone,
     };
 
     localStorage.setItem("liquid-user", JSON.stringify(user));
@@ -121,13 +160,13 @@ function LoginContent() {
         return;
       }
 
-      saveUserSession(authForm.name);
+      saveUserSession(authForm.name, authForm.email, authForm.phone);
       resetAuthForm();
       return;
     }
 
     const loginName = authForm.email.split("@")[0] || "Customer";
-    saveUserSession(loginName);
+    saveUserSession(loginName, authForm.email);
     resetAuthForm();
   };
 
@@ -161,6 +200,25 @@ function LoginContent() {
     resetAuthForm();
   };
 
+  const handleProfileSave = () => {
+    const trimmedName = profileName.trim() || "Customer";
+    const user = {
+      isLoggedIn: true,
+      name: trimmedName,
+      email: profileEmail.trim(),
+      phone: profilePhone.trim(),
+    };
+
+    localStorage.setItem("liquid-user", JSON.stringify(user));
+    setCurrentUser(trimmedName);
+    setAccountMessage("Profile saved successfully.");
+  };
+
+  const handleAddressSave = () => {
+    handleCheckoutSave();
+    setAccountMessage("Address saved successfully.");
+  };
+
   const onForgotPassword = async () => {
     setResetMessage("");
     setResetError("");
@@ -182,6 +240,163 @@ function LoginContent() {
       setResetLoading(false);
     }
   };
+
+  if (isLoggedIn) {
+    return (
+      <div className="relative min-h-screen w-full overflow-hidden bg-neutral-950 px-4 py-10 md:px-6 lg:px-10">
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute -left-[10%] -top-[10%] h-[40%] w-[40%] rounded-full bg-[#2f7ea1]/10 blur-[120px]" />
+          <div className="absolute -right-[10%] -bottom-[10%] h-[40%] w-[40%] rounded-full bg-blue-900/10 blur-[120px]" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-[900px]">
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-[0.35em] text-white/40">Account</p>
+            <h1 className="mt-3 text-3xl font-semibold text-white md:text-5xl">
+              {accountView === "address" ? "Address" : "My Profile"}
+            </h1>
+          </div>
+
+          <div className="mb-6 flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
+            <Link
+              href="/login?view=profile"
+              onClick={() => setAccountMessage("")}
+              className={`flex-1 rounded-lg px-4 py-3 text-center text-xs font-bold uppercase tracking-widest transition ${
+                accountView === "profile" ? "bg-white text-black" : "text-white/50 hover:text-white"
+              }`}
+            >
+              My Profile
+            </Link>
+            <Link
+              href="/login?view=address"
+              onClick={() => setAccountMessage("")}
+              className={`flex-1 rounded-lg px-4 py-3 text-center text-xs font-bold uppercase tracking-widest transition ${
+                accountView === "address" ? "bg-white text-black" : "text-white/50 hover:text-white"
+              }`}
+            >
+              Address
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-7">
+            {accountView === "profile" ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Full name</span>
+                  <span className="relative block">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="Your name"
+                    />
+                  </span>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Email</span>
+                  <span className="relative block">
+                    <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      type="email"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="hello@example.com"
+                    />
+                  </span>
+                </label>
+
+                <label className="space-y-2 md:col-span-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Phone</span>
+                  <span className="relative block">
+                    <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="+880 1XXX XXXXXX"
+                    />
+                  </span>
+                </label>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Receiver name</span>
+                  <span className="relative block">
+                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      value={checkoutForm.name}
+                      onChange={(e) => handleCheckoutInput("name", e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="Full name"
+                    />
+                  </span>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Email address</span>
+                  <span className="relative block">
+                    <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      type="email"
+                      value={checkoutForm.email}
+                      onChange={(e) => handleCheckoutInput("email", e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="hello@example.com"
+                    />
+                  </span>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Phone number</span>
+                  <span className="relative block">
+                    <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                    <input
+                      value={checkoutForm.phone}
+                      onChange={(e) => handleCheckoutInput("phone", e.target.value)}
+                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                      placeholder="+880 1XXX XXXXXX"
+                    />
+                  </span>
+                </label>
+
+                <label className="space-y-2 md:col-span-2">
+                  <span className="text-xs uppercase tracking-widest text-white/35">Delivery address</span>
+                  <span className="relative block">
+                    <MapPinned className="absolute left-4 top-4 h-4 w-4 text-white/30" />
+                    <textarea
+                      value={checkoutForm.address}
+                      onChange={(e) => handleCheckoutInput("address", e.target.value)}
+                      rows={5}
+                      className="w-full resize-none rounded-xl border border-white/10 bg-black/20 py-3 pl-11 pr-4 text-sm leading-6 text-white outline-none transition focus:border-white/25"
+                      placeholder="House, road, area, city"
+                    />
+                  </span>
+                </label>
+              </div>
+            )}
+
+            {accountMessage && (
+              <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                {accountMessage}
+              </div>
+            )}
+
+            <button
+              onClick={accountView === "profile" ? handleProfileSave : handleAddressSave}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+            >
+              <Save className="h-4 w-4" />
+              {accountView === "profile" ? "Save Profile" : "Save Address"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

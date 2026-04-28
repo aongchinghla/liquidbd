@@ -26,3 +26,9 @@ input,
 textarea {
   font: inherit;
 }
+
+@layer utilities {
+  .site-shell {
+    @apply mx-auto w-full max-w-[1600px] px-4 md:px-5 lg:px-6;
+  }
+}

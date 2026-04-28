@@ -1,4 +1,5 @@
 import { Minus, Plus, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export interface CartItem {
   id: number;
@@ -6,6 +7,7 @@ export interface CartItem {
   name: string;
   price: number;
   tag?: string;
+  productType: string;
   category: string;
   image: string;
   quantity: number;
@@ -27,7 +29,6 @@ interface CartDrawerProps {
   removeFromCart: (cartItemId: string) => void;
   updateCartQuantity: (cartItemId: string, delta: number) => void;
   setIsCartOpen: (open: boolean) => void;
-  setIsCheckoutOpen: (open: boolean) => void;
 }
 
 export default function CartDrawer({
@@ -36,8 +37,9 @@ export default function CartDrawer({
   removeFromCart,
   updateCartQuantity,
   setIsCartOpen,
-  setIsCheckoutOpen,
 }: CartDrawerProps) {
+  const router = useRouter();
+
   return (
     <div className="fixed inset-0 z-[60] flex justify-end bg-black/60 backdrop-blur-sm">
       <div className="h-full w-full max-w-md overflow-y-auto border-l border-white/10 bg-neutral-950 p-6 shadow-2xl shadow-black/50">
@@ -67,7 +69,10 @@ export default function CartDrawer({
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm text-white/45">{item.category}</p>
+                        <p className="text-sm text-white/45">
+                          {item.productType}
+                          {item.category ? ` · ${item.category}` : ""}
+                        </p>
                         <h5 className="mt-1 font-medium">{item.name}</h5>
                         <div className="mt-1 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-white/40">
                           {item.selectedSize && <span>Size: {item.selectedSize}</span>}
@@ -115,7 +120,10 @@ export default function CartDrawer({
             <span>bKash / Nagad / COD</span>
           </div>
           <button
-            onClick={() => setIsCheckoutOpen(true)}
+            onClick={() => {
+              setIsCartOpen(false);
+              router.push("/checkout");
+            }}
             className="mt-5 w-full rounded-full bg-white px-4 py-3 text-sm font-semibold text-black"
           >
             Proceed to Checkout

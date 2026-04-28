@@ -15,19 +15,16 @@ export default function IndigenousBanner() {
           sizes="100vw"
         />
 
-        {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/40 lg:bg-gradient-to-r lg:from-black/70 lg:via-black/30 lg:to-transparent" />
 
         <div className="absolute inset-0 flex items-center">
-          <div className="mx-auto w-full max-w-[1600px] px-6 lg:px-10">
+          <div className="site-shell">
             <div className="max-w-xl">
-              {/* Heading size komano hoyeche */}
               <h2 className="text-2xl font-bold leading-tight text-white md:text-3xl lg:text-4xl">
                 Decades of Indigenous <br className="hidden md:block" /> 
                 Knowledge in Every Thread
               </h2>
               
-              {/* Description size-o ektu choto kora hoyeche */}
               <p className="mt-3 max-w-md text-sm leading-relaxed text-white/80 md:text-base">
                 Each piece carries the legacy of Indigenous traditions, 
                 honoring decades of cultural knowledge and craftsmanship.

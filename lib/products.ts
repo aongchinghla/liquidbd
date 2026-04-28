@@ -3,12 +3,16 @@ export interface Color {
   hex: string;
 }
 
+export const PRODUCT_TYPES = ["T-Shirt", "Shirt"] as const;
+export type ProductType = (typeof PRODUCT_TYPES)[number];
+
 export interface Product {
   id: number;
   slug: string;
   name: string;
   price: number;
   tag?: string;
+  productType: ProductType;
   category: string;
   image: string;
   images: string[];
@@ -30,6 +34,7 @@ export const products: Product[] = [
     name: "Hojagiri-Boishabi",
     price: 500,
     tag: "CHT",
+    productType: "T-Shirt",
     category: "Cht",
     image: "/product/hojagiri.jpg",
     images: [
@@ -50,6 +55,7 @@ export const products: Product[] = [
     name: "Ajau",
     price: 500,
     tag: "Best Seller",
+    productType: "T-Shirt",
     category: "",
     image: "/product/ajau.jpg",
     images: [
@@ -70,6 +76,7 @@ export const products: Product[] = [
     name: "Bitchi – The Rabuga",
     price: 500,
     tag: "",
+    productType: "T-Shirt",
     category: "Collaboration",
     image: "/product/rabuga_bitch.jpg",
     images: [
@@ -90,6 +97,7 @@ export const products: Product[] = [
     name: "Buga Rani",
     price: 500,
     tag: "Limited",
+    productType: "T-Shirt",
     category: "Mythology",
     image: "/product/buga_rani.jpg",
     images: [
@@ -110,6 +118,7 @@ export const products: Product[] = [
     name: "Ganna",
     price: 500,
     tag: "Premium",
+    productType: "T-Shirt",
     category: "Ganna",
     image: "/product/ganna.jpg",
     images: [
@@ -130,6 +139,7 @@ export const products: Product[] = [
     name: "Garo King",
     price: 500,
     tag: "",
+    productType: "T-Shirt",
     category: "",
     image: "/product/garo_king.jpg",
     images: [
@@ -149,6 +159,7 @@ export const products: Product[] = [
     name: "Garo Queen",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "",
     image: "/product/garo_queen.jpg",
     images: [
@@ -169,6 +180,7 @@ export const products: Product[] = [
     name: "Ha.a Ganna",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "Ganna",
     image: "/ha.a_ganna.jpg",
     images: [
@@ -189,6 +201,7 @@ export const products: Product[] = [
     name: "Jang.ki Ganna",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "Ganna",
     image: "/product/jang.ki_ganna.jpg",
     images: [
@@ -208,6 +221,7 @@ export const products: Product[] = [
     name: "Kha Marak",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "",
     image: "/product/kha_marak.jpg",
     images: [
@@ -227,6 +241,7 @@ export const products: Product[] = [
     name: "Kha Sangma",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "",
     image: "/product/kha_sangma.jpg",
     images: [
@@ -246,6 +261,7 @@ export const products: Product[] = [
     name: "Liquid",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "",
     image: "/product/liquid_tee.jpg",
     images: [
@@ -266,6 +282,7 @@ export const products: Product[] = [
     name: "Misi Saljong",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "",
     image: "/product/misi_saljong.jpg",
     images: [
@@ -286,6 +303,7 @@ export const products: Product[] = [
     name: "Nokna",
     price: 500,
     tag: "Capsule",
+    productType: "T-Shirt",
     category: "Nokna",
     image: "/product/nokna.jpg",
     images: [
@@ -305,6 +323,7 @@ export const products: Product[] = [
     name: "Red Ganna",
     price: 500,
     tag: "",
+    productType: "T-Shirt",
     category: "Ganna",
     image: "/product/red_ganna.jpg",
     images: [
@@ -324,6 +343,7 @@ export const products: Product[] = [
     name: "Sacrament",
     price: 500,
     tag: "",
+    productType: "T-Shirt",
     category: "Collaboration",
     image: "/product/sacrament.jpg",
     images: [
@@ -343,6 +363,7 @@ export const products: Product[] = [
     name: "Wangala",
     price: 500,
     tag: "",
+    productType: "T-Shirt",
     category: "",
     image: "/product/wangala.jpg",
     images: [

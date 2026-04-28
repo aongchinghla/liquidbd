@@ -31,9 +31,8 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
   return (
     <section
       id="collections"
-      className="mx-auto max-w-[1600px] px-6 py-10 lg:px-10 lg:py-16"
+      className="site-shell py-10 lg:py-16"
     >
-      {/* Header Section */}
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/40">
@@ -49,14 +48,12 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
         </p>
       </div>
 
-      {/* Grid Layout */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((item) => (
           <div
             key={item.title}
             className="group relative overflow-hidden rounded-2xl border border-white/10 bg-neutral-900 transition-all duration-500"
           >
-            {/* Optimized Image Height for Mobile */}
             <div className="relative h-[420px] w-full xs:h-[480px] md:h-[500px] lg:h-[530px]">
               <Image
                 src={item.image}
@@ -66,10 +63,7 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
 
-              {/* Dark Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-              {/* Content Overlay */}
               <div className="absolute inset-x-6 bottom-8 md:inset-x-8 md:bottom-10">
                 <h4 className="text-2xl font-bold text-white md:text-3xl">
                   {item.title}
@@ -78,7 +72,6 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
                   {item.subtitle}
                 </p>
 
-                {/* Updated Button: Less Rounded & Original Color */}
                 <button
                   onClick={() => onSelectCategory?.(item.button)}
                   className="mt-6 rounded-lg bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-sky-500 active:scale-95 sm:w-auto"

@@ -48,16 +48,24 @@ function ShopSection() {
 export default function Page() {
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".hero-fade",
-        { opacity: 0, y: 28 },
-        { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: "power3.out" }
-      );
-      gsap.fromTo(
-        ".card-fade",
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.15 }
-      );
+      const heroItems = Array.from(document.querySelectorAll<HTMLElement>(".hero-fade"));
+      const cardItems = Array.from(document.querySelectorAll<HTMLElement>(".card-fade"));
+
+      if (heroItems.length > 0) {
+        gsap.fromTo(
+          heroItems,
+          { opacity: 0, y: 28 },
+          { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: "power3.out" }
+        );
+      }
+
+      if (cardItems.length > 0) {
+        gsap.fromTo(
+          cardItems,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.15 }
+        );
+      }
     });
 
     return () => ctx.revert();

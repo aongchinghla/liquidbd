@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Hero() {
   return (
     <section id="home" className="overflow-hidden">
-      <div className="mx-auto grid max-w-[1600px] items-center gap-14 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-24">
+      <div className="site-shell grid items-center gap-14 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
         <div className="md:-translate-y-6 lg:-translate-y-20">
           <div className="hero-fade relative inline-block">
             <Image
@@ -51,7 +51,6 @@ export default function Hero() {
               alt="Premium dark fashion t-shirt"
               className="h-[620px] w-full rounded-[1.5rem] object-cover"
             />
-            {/* Card Overlay - "Featured Drop" Text Removed */}
             <div className="absolute inset-x-8 bottom-8 rounded-[1.5rem] border border-white/10 bg-black/60 p-6 backdrop-blur-xl">
               <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <div>

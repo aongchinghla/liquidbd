@@ -16,10 +16,11 @@ export default function ProductCard({
   formatPrice,
 }: ProductCardProps) {
   const hasCategory = product.category.trim().length > 0;
+  const metaLabel = hasCategory ? `${product.productType} · ${product.category}` : product.productType;
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] transition-all duration-500 hover:border-white/20 hover:bg-white/[0.05]">
-      {/* Image Section */}
+
       <Link href={`/shop/${product.slug}`} className="block relative aspect-square w-full overflow-hidden">
         <img
           src={product.image}
@@ -28,7 +29,6 @@ export default function ProductCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-        {/* Hover Overlay Icon */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-500 group-hover:opacity-100">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-xl translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
             <Eye className="h-4 w-4" />
@@ -42,15 +42,12 @@ export default function ProductCard({
         ) : null}
       </Link>
 
-      {/* Info Section */}
       <div className="p-5">
         <div className="flex flex-col gap-1.5">
           <p
-            className={`text-[9px] uppercase tracking-[0.3em] text-white/30 transition-colors group-hover:text-white/50 ${hasCategory ? "" : "select-none opacity-0"
-              }`}
-            aria-hidden={!hasCategory}
+            className="text-[9px] uppercase tracking-[0.3em] text-white/30 transition-colors group-hover:text-white/50"
           >
-            {hasCategory ? product.category : "Category"}
+            {metaLabel}
           </p>
 
           <div className="flex items-start justify-between gap-3">

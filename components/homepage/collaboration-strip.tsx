@@ -19,29 +19,33 @@ export default function Collaborations() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".collab-item",
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        }
-      );
+      const items = Array.from(containerRef.current?.querySelectorAll<HTMLElement>(".collab-item") ?? []);
+
+      if (items.length > 0 && containerRef.current) {
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          }
+        );
+      }
     }, containerRef);
     return () => ctx.revert();
   }, []);
 
   return (
     <section id="collaborations" ref={containerRef} className="border-y border-white/10 py-6 lg:py-6">
-      <div className="mx-auto max-w-[1600px] px-6 lg:px-10">
+      <div className="site-shell">
         <div className="grid grid-cols-2 items-center justify-items-center gap-8 md:grid-cols-4 lg:gap-12">
           {collaborators.map((brand) => (
             <div key={brand.name} className="collab-item flex w-full items-center justify-center py-2">

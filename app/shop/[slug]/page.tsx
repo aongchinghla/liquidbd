@@ -62,7 +62,6 @@ export default function ProductDetailsPage() {
     setIsAdding(true);
     addToCart(product, selectedColor, selectedSize);
     
-    // Simple feedback animation delay
     setTimeout(() => {
       setIsAdding(false);
     }, 1000);
@@ -77,17 +76,21 @@ export default function ProductDetailsPage() {
   };
 
   const relatedProducts = products
-    .filter((p) => p.category === product.category && p.slug !== product.slug)
+    .filter(
+      (p) =>
+        p.slug !== product.slug &&
+        p.productType === product.productType &&
+        p.category === product.category
+    )
     .slice(0, 4);
 
-  // Fallback to other products if none in the same category
   const finalRelatedProducts = relatedProducts.length > 0 
     ? relatedProducts 
-    : products.filter(p => p.slug !== product.slug).slice(0, 4);
+    : products.filter((p) => p.slug !== product.slug && p.productType === product.productType).slice(0, 4);
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-6 lg:px-10 lg:py-10">
-      {/* Breadcrumbs */}
+    <div className="site-shell max-w-[1500px] py-8 lg:py-10">
+
       <nav className="mb-6 flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40">
         <Link href="/" className="hover:text-white transition">Home</Link>
         <ChevronRight className="h-2.5 w-2.5" />
@@ -97,7 +100,7 @@ export default function ProductDetailsPage() {
       </nav>
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-10 justify-items-center lg:justify-items-start">
-        {/* Left Side: Image Gallery */}
+
         <div className="space-y-4 w-full lg:max-w-[520px] lg:ml-auto">
           <div 
             ref={imageContainerRef}
@@ -140,10 +143,10 @@ export default function ProductDetailsPage() {
           )}
         </div>
 
-        {/* Right Side: Product details */}
         <div className="flex flex-col w-full lg:max-w-[500px] lg:mr-auto">
           <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.25em] text-white/40">
-            {product.category || "General"}
+            {product.productType}
+            {product.category ? ` · ${product.category}` : ""}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
             {product.name}
@@ -162,7 +165,7 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="mt-8 space-y-8">
-            {/* Color Selection */}
+
             {product.colors.length > 0 && (
               <div className="space-y-3">
                 <div className="flex justify-between text-[11px] uppercase tracking-widest">
@@ -188,7 +191,6 @@ export default function ProductDetailsPage() {
               </div>
             )}
 
-            {/* Size Selection */}
             {product.sizes.length > 0 && (
               <div className="space-y-3">
                 <div className="flex justify-between text-[11px] uppercase tracking-widest">
@@ -212,7 +214,6 @@ export default function ProductDetailsPage() {
               </div>
             )}
 
-            {/* Quantity and Add to Cart */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center pt-2">
               <div className="flex h-11 items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-2 sm:w-32">
                 <button
@@ -247,7 +248,6 @@ export default function ProductDetailsPage() {
             </div>
           </div>
 
-          {/* Features / trust badges */}
           <div className="mt-12 grid grid-cols-1 gap-4 border-t border-white/10 pt-8 sm:grid-cols-3">
             <div className="flex items-center gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.03] border border-white/10">
@@ -280,7 +280,6 @@ export default function ProductDetailsPage() {
         </div>
       </div>
 
-      {/* Related Products Section */}
       <div className="mt-24 border-t border-white/10 pt-16">
         <div className="mb-10 flex items-end justify-between">
           <div className="space-y-2">

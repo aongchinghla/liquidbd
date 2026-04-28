@@ -3,27 +3,27 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Product } from "@/lib/products";
 import { CartItem } from "@/components/modals/cart-drawer";
-import { CheckoutForm } from "@/components/modals/checkout-modal";
+import { calculatePromoDiscount, CheckoutForm } from "@/lib/checkout";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import CartDrawer from "@/components/modals/cart-drawer";
-import CheckoutModal from "@/components/modals/checkout-modal";
 
 interface AppContextType {
   cart: CartItem[];
+  isReady: boolean;
   isLoggedIn: boolean;
   setIsLoggedIn: (value: boolean) => void;
   currentUser: string;
   setCurrentUser: (name: string) => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
-  isCheckoutOpen: boolean;
-  setIsCheckoutOpen: (open: boolean) => void;
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
   addToCart: (product: Product, selectedColor?: string, selectedSize?: string) => void;
   removeFromCart: (cartItemId: string) => void;
   updateCartQuantity: (cartItemId: string, delta: number) => void;
+  clearCart: () => void;
+  placeOrder: (orderId: string) => number;
   handleLogout: () => void;
   checkoutForm: CheckoutForm;
   handleCheckoutInput: (field: keyof CheckoutForm, value: string) => void;
@@ -74,20 +74,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
     isMenuOpen,
     setIsMenuOpen,
     isLoggedIn,
-    setIsLoggedIn,
     currentUser,
-    setCurrentUser,
     isCartOpen,
     setIsCartOpen,
-    isCheckoutOpen,
-    setIsCheckoutOpen,
     cart,
     subtotal,
     removeFromCart,
     updateCartQuantity,
-    checkoutForm,
-    handleCheckoutInput,
-    handleCheckoutSave,
     handleLogout,
   } = context;
 
@@ -116,17 +109,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
           removeFromCart={removeFromCart}
           updateCartQuantity={updateCartQuantity}
           setIsCartOpen={setIsCartOpen}
-          setIsCheckoutOpen={setIsCheckoutOpen}
-        />
-      )}
-
-      {isCheckoutOpen && (
-        <CheckoutModal
-          checkoutForm={checkoutForm}
-          handleCheckoutInput={handleCheckoutInput}
-          subtotal={subtotal}
-          handleCheckoutSave={handleCheckoutSave}
-          setIsCheckoutOpen={setIsCheckoutOpen}
         />
       )}
     </div>
@@ -136,13 +118,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState("Guest");
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>({
     name: "",
+    email: "",
     phone: "",
     address: "",
+    promoCode: "",
+    paymentMethod: "Cash on Delivery",
+    bkashSenderLast4: "",
+    bkashTransactionId: "",
+    nagadSenderLast4: "",
+    nagadTransactionId: "",
   });
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -153,7 +142,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedCheckout = localStorage.getItem("liquid-checkout");
 
       if (savedCart) setCart(JSON.parse(savedCart));
-      if (savedCheckout) setCheckoutForm(JSON.parse(savedCheckout));
+      if (savedCheckout) {
+        setCheckoutForm((prev) => ({ ...prev, ...JSON.parse(savedCheckout) }));
+      }
 
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
@@ -162,6 +153,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("localStorage load error", error);
+    } finally {
+      setIsReady(true);
     }
   }, []);
 
@@ -191,6 +184,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => changeQuantity(prev, cartItemId, delta));
   };
 
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  const placeOrder = (orderId: string) => {
+    const deliveryCharge = subtotal > 0 ? 80 : 0;
+    const promo = calculatePromoDiscount(subtotal, checkoutForm.promoCode);
+    const total = Math.max(subtotal + deliveryCharge - promo.discount, 0);
+
+    localStorage.setItem(
+      "liquid-last-order",
+      JSON.stringify({
+        orderId,
+        total,
+        discount: promo.discount,
+        promoCode: promo.appliedPromoCode,
+        items: cart,
+        checkout: checkoutForm,
+        placedAt: new Date().toISOString(),
+      })
+    );
+
+    clearCart();
+    setIsCartOpen(false);
+
+    return total;
+  };
+
   const handleCheckoutInput = (field: keyof CheckoutForm, value: string) => {
     setCheckoutForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -203,24 +224,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const handleCheckoutSave = () => {
     localStorage.setItem("liquid-checkout", JSON.stringify(checkoutForm));
-    setIsCheckoutOpen(false);
   };
 
   const value: AppContextType = {
     cart,
+    isReady,
     isLoggedIn,
     setIsLoggedIn,
     currentUser,
     setCurrentUser,
     isCartOpen,
     setIsCartOpen,
-    isCheckoutOpen,
-    setIsCheckoutOpen,
     isMenuOpen,
     setIsMenuOpen,
     addToCart,
     removeFromCart,
     updateCartQuantity,
+    clearCart,
+    placeOrder,
     handleLogout,
     checkoutForm,
     handleCheckoutInput,

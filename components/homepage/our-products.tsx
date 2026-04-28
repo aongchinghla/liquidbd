@@ -26,7 +26,7 @@ export default function ProductsSection({
   addToCart,
 }: ProductsSectionProps) {
   return (
-    <section id="featured" className="mx-auto max-w-[1600px] px-6 py-12 lg:px-10 lg:py-16">
+    <section id="featured" className="site-shell py-12 lg:py-16">
       <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-white/45">

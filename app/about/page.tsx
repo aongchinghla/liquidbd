@@ -83,15 +83,11 @@ const team: TeamMember[] = [
   },
 ];
 
-function SectionDivider() {
-  return <div className="w-full border-t border-white/10" />;
-}
-
 function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
   const [activeMilestone, setActiveMilestone] = useState(0);
 
   return (
-    <section className="relative overflow-hidden py-12 md:py-20">
+    <section className="relative overflow-hidden pt-3 pb-12 md:pt-4 md:pb-16">
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 w-full -translate-x-1/2 -translate-y-1/2 select-none overflow-hidden">
         <div
           className="whitespace-nowrap text-[180px] font-black italic leading-none tracking-tighter text-white/[0.03] opacity-0 transition-all duration-1000 ease-in-out md:text-[320px] md:opacity-100"
@@ -192,6 +188,7 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
                   alt={item.title}
                   fill
                   className="object-contain bg-neutral-950 transition-transform duration-[1800ms] group-hover/image:scale-[1.01]"
+                  sizes="(max-width: 1024px) 100vw, 48vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 via-transparent to-transparent opacity-60" />
               </div>
@@ -206,6 +203,7 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
               alt={milestones[activeMilestone].title}
               fill
               className="object-contain bg-neutral-950 transition-all duration-500"
+              sizes="100vw"
             />
           </div>
         </div>
@@ -217,16 +215,24 @@ function MilestoneGallery({ milestones }: { milestones: Milestone[] }) {
 export default function AboutPage() {
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".hero-fade",
-        { opacity: 0, y: 28 },
-        { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: "power3.out" }
-      );
-      gsap.fromTo(
-        ".card-fade",
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.15 }
-      );
+      const heroItems = Array.from(document.querySelectorAll<HTMLElement>(".hero-fade"));
+      const cardItems = Array.from(document.querySelectorAll<HTMLElement>(".card-fade"));
+
+      if (heroItems.length > 0) {
+        gsap.fromTo(
+          heroItems,
+          { opacity: 0, y: 28 },
+          { opacity: 1, y: 0, duration: 0.9, stagger: 0.12, ease: "power3.out" }
+        );
+      }
+
+      if (cardItems.length > 0) {
+        gsap.fromTo(
+          cardItems,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.15 }
+        );
+      }
     });
 
     return () => ctx.revert();
@@ -234,7 +240,6 @@ export default function AboutPage() {
 
   return (
     <div className="flex flex-col bg-neutral-950 text-white">
-      {/* Hero Section */}
       <section className="relative flex h-[60vh] min-h-[400px] w-full items-center justify-center overflow-hidden border-b border-white/5 bg-neutral-950">
         <div className="absolute inset-0 z-0 scale-105">
           <Image
@@ -243,11 +248,12 @@ export default function AboutPage() {
             fill
             className="object-cover opacity-20 grayscale"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-neutral-950/80 to-neutral-950" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 text-center">
+        <div className="site-shell relative z-10 text-center">
           <div className="hero-fade mb-6 inline-block rounded-full border border-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
             Crafting Identity
           </div>
@@ -265,10 +271,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="mx-auto w-full max-w-[1600px] px-6 py-10 md:px-10 md:py-14">
-        {/* Story Section */}
-        <section className="py-6 md:py-8">
+      <div className="site-shell space-y-8 py-12 md:space-y-12 md:py-16">
+        <section className="py-8 md:py-10">
           <div className="grid items-center gap-10 md:grid-cols-2">
             <div className="relative min-h-[520px] overflow-hidden rounded-[4px] border border-white/10 order-1">
               <Image
@@ -276,6 +280,7 @@ export default function AboutPage() {
                 alt="The Beginning of Liquid"
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
 
@@ -291,7 +296,7 @@ export default function AboutPage() {
                     contradictions and, more troublingly, factual inaccuracies. It was a wake up call. I realized if
                     our generation fails to preserve the correct cultural knowledge then it will be lost from the face
                     of the earth. It grew a deep sense of responsibility inside me. I knew I had to do something – that’s
-                    when the concept of “Liquid” was born.
+                    when the concept of <span className="text-white">"Liquid"</span>{" "} was born.
                   </p>
                   <p>
                     I know I can’t do everything — preserving and promoting an entire culture isn’t a one-person task.
@@ -317,33 +322,21 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <div className="my-10 md:my-14">
-          <SectionDivider />
-        </div>
-
-        {/* Journey Title */}
-        <section className="py-2 text-center">
+        <section className="pt-8 pb-2 text-center md:pt-10 md:pb-3">
           <h3 className="text-[20px] font-medium tracking-tight text-white/90 md:text-[28px]">
             Here&apos;s what we&apos;ve accomplished together so far:
           </h3>
         </section>
 
-        {/* Timeline Section */}
         <MilestoneGallery milestones={milestones} />
 
-        <div className="my-10 md:my-14">
-          <SectionDivider />
-        </div>
-
-        {/* Team Title */}
-        <section className="py-2 text-center">
+        <section className="pt-3 pb-2 text-center md:pt-4 md:pb-3">
           <h3 className="text-[24px] font-medium tracking-tight text-white md:text-[36px]">
             Team Liquid
           </h3>
         </section>
 
-        {/* Team Section */}
-        <section className="py-12 md:py-10">
+        <section className="pt-4 pb-14 md:pt-5 md:pb-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {team.map((member, index) => (
               <div key={index} className="flex flex-col group text-center">
@@ -353,6 +346,7 @@ export default function AboutPage() {
                     alt={member.name}
                     fill
                     className="object-cover transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
 
