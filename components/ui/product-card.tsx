@@ -103,12 +103,26 @@ export default function ProductCard({
         <img
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+          className={`h-full w-full object-cover transition duration-700 ${
+            isVariantSelectorOpen ? "scale-100" : "group-hover:scale-110"
+          }`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div
+          className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-500 ${
+            isVariantSelectorOpen ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+          }`}
+        />
 
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-500 group-hover:opacity-100">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-xl translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
+        <div
+          className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+            isVariantSelectorOpen ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+          }`}
+        >
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform duration-500 ${
+              isVariantSelectorOpen ? "translate-y-0" : "translate-y-4 group-hover:translate-y-0"
+            }`}
+          >
             <Eye className="h-4 w-4" />
           </div>
         </div>

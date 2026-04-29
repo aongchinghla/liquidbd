@@ -264,7 +264,7 @@ export default function ProductDetailsPage() {
         <div className="flex flex-col w-full lg:max-w-[500px] lg:mr-auto">
           <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.25em] text-white/40">
             {product.productType}
-            {product.category ? ` Â· ${product.category}` : ""}
+            {product.category ? ` | ${product.category}` : ""}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
             {product.name}

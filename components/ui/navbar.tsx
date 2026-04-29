@@ -261,8 +261,8 @@ export default function Navbar({
       )}
 
       <div
-        className={`fixed right-0 top-0 z-[90] flex h-dvh w-[min(88vw,360px)] flex-col border-l border-white/10 bg-[#111111] shadow-[0_24px_60px_rgba(0,0,0,0.45)] transition-transform duration-300 ease-out lg:hidden ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-0 top-0 z-[90] flex h-dvh w-[min(88vw,360px)] flex-col border-l border-white/10 bg-[#111111] shadow-[0_24px_60px_rgba(0,0,0,0.45)] lg:hidden ${
+          isMenuOpen ? "block" : "hidden"
         }`}
         aria-label="Navigation menu"
         role="dialog"

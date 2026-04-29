@@ -124,7 +124,7 @@ function ShopPageContent() {
                 ? activeFilter === "All"
                   ? "All Products"
                   : activeFilter
-                : `${activeTypeFilter}${activeFilter === "All" ? "" : ` · ${activeFilter}`}`}
+                : `${activeTypeFilter}${activeFilter === "All" ? "" : ` | ${activeFilter}`}`}
             </h1>
           </div>
         </div>

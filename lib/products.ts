@@ -162,7 +162,7 @@ export const products: Product[] = [
   {
     id: 3,
     slug: "bitchi-the-rabuga",
-    name: "Bitchi – The Rabuga",
+    name: "Bitchi - The Rabuga",
     price: 500,
     discountPercentage: 10,
     tag: "",

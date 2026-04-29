@@ -154,7 +154,7 @@ export default function Footer() {
 
         <div className="mt-9 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-white/38 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <p>© 2026 Liquid. All rights reserved.</p>
+            <p>(c) 2026 Liquid. All rights reserved.</p>
           </div>
           <div className="flex flex-wrap gap-5 md:justify-end">
             <a href="#" className="transition hover:text-white/80">
