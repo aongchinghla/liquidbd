@@ -152,18 +152,18 @@ export default function ProductDetailsPage() {
     setZoomStyle({ transformOrigin: `${x}% ${y}%` });
   };
 
-  const relatedProducts = products
-    .filter(
-      (p) =>
-        p.slug !== product.slug &&
-        p.productType === product.productType &&
-        p.category === product.category
-    )
-    .slice(0, 4);
-
-  const finalRelatedProducts = relatedProducts.length > 0 
-    ? relatedProducts 
-    : products.filter((p) => p.slug !== product.slug && p.productType === product.productType).slice(0, 4);
+  const normalizedCategory = product.category.trim();
+  const categoryRelatedProducts = normalizedCategory
+    ? products.filter(
+        (p) =>
+          p.slug !== product.slug &&
+          p.productType === product.productType &&
+          p.category.trim() === normalizedCategory
+      )
+    : [];
+  const finalRelatedProducts = categoryRelatedProducts.slice(0, 4);
+  const relatedProductsLabel = normalizedCategory ? `${normalizedCategory} Collection` : "You Might Also Like";
+  const relatedProductsTitle = normalizedCategory ? `More from ${normalizedCategory}` : "Related Products";
   const discountedPrice = getDiscountedPrice(product);
   const hasDiscount = hasProductDiscount(product);
   const productTabContent = getProductTabContent(product);
@@ -639,27 +639,29 @@ export default function ProductDetailsPage() {
         </div>
       </section>
 
-      <div className="mt-24 pt-16">
-        <div className="mb-10 flex items-end justify-between">
-          <div className="space-y-2">
-            <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/40">You Might Also Like</span>
-            <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">Related Products</h2>
+      {finalRelatedProducts.length > 0 ? (
+        <div className="mt-24 pt-16">
+          <div className="mb-10 flex items-end justify-between">
+            <div className="space-y-2">
+              <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/40">{relatedProductsLabel}</span>
+              <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{relatedProductsTitle}</h2>
+            </div>
+            <Link href="/shop" className="text-xs font-semibold uppercase tracking-widest text-white/60 hover:text-white transition decoration-white/20 underline underline-offset-8">
+              View All Shop
+            </Link>
           </div>
-          <Link href="/shop" className="text-xs font-semibold uppercase tracking-widest text-white/60 hover:text-white transition decoration-white/20 underline underline-offset-8">
-            View All Shop
-          </Link>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-6 lg:gap-8">
+            {finalRelatedProducts.map((p) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                addToCart={addToCart}
+                formatPrice={formatPrice}
+              />
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6 lg:gap-8">
-          {finalRelatedProducts.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              addToCart={addToCart}
-              formatPrice={formatPrice}
-            />
-          ))}
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }
