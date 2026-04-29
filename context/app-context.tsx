@@ -1,12 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Product } from "@/lib/products";
+import { getDiscountedPrice, Product } from "@/lib/products";
 import { CartItem } from "@/components/modals/cart-drawer";
 import { calculatePromoDiscount, CheckoutForm } from "@/lib/checkout";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import CartDrawer from "@/components/modals/cart-drawer";
+import WhatsAppChatbot from "@/components/ui/whatsapp-chatbot";
 
 interface AppContextType {
   cart: CartItem[];
@@ -111,6 +112,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <main className="relative z-10">{children}</main>
 
       <Footer />
+      <WhatsAppChatbot />
 
       {isCartOpen && (
         <CartDrawer
@@ -186,7 +188,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [checkoutForm]);
 
   const subtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    () => cart.reduce((sum, item) => sum + getDiscountedPrice(item) * item.quantity, 0),
     [cart]
   );
 

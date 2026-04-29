@@ -37,9 +37,9 @@ export default function Hero() {
             Where Indigenous Traditions Flow into Fashion.
           </p>
 
-          <div className="hero-fade mt-8 flex flex-col gap-4 sm:flex-row md:justify-start">
+          <div className="hero-fade mt-8 flex flex-col items-start gap-4 sm:flex-row md:justify-start">
             <Link href="/shop" className="self-start">
-              <button className="inline-flex items-center justify-center gap-2.5 rounded-full bg-sky-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-sky-500 active:scale-95">
+              <button className="inline-flex items-center justify-center gap-2.5 rounded-full bg-sky-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-sky-500 active:scale-95">
                 Shop Now
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white">
                   <ShoppingBag className="h-3.5 w-3.5 text-sky-600" />
@@ -47,8 +47,8 @@ export default function Hero() {
               </button>
             </Link>
 
-            <Link href="#collections" className="w-full sm:w-auto">
-              <button className="w-full rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/20 active:scale-95 sm:w-auto">
+            <Link href="#collections" className="self-start">
+              <button className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-white/20 active:scale-95">
                 Explore Collection
               </button>
             </Link>

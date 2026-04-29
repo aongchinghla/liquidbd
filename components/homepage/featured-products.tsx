@@ -28,7 +28,7 @@ function getFeaturedProducts(allProducts: Product[], limit: number) {
 
 interface FeaturedProductsProps {
   products: Product[];
-  addToCart: (product: Product) => void;
+  addToCart: (product: Product, selectedColor?: string, selectedSize?: string) => void;
   limit?: number;
 }
 

@@ -88,7 +88,8 @@ export default function Navbar({
     href === "/shop" ? pathname === "/shop" || pathname.startsWith("/shop/") : pathname === href;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#242424]/95 backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 w-full border-b border-[#12384a] bg-black/95 backdrop-blur-2xl">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[#2f7ea1]" />
       <div ref={shellRef} className="site-shell relative px-2.5 py-2 sm:px-3 md:px-5 lg:px-6">
         <div className="grid gap-2">
           <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 lg:grid-cols-[auto_minmax(360px,620px)_auto] lg:justify-between">
@@ -185,7 +186,7 @@ export default function Navbar({
 
               <button
                 onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="-mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05] lg:hidden"
+                className="-mr-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-sky-500/70 bg-sky-600 text-white transition hover:bg-sky-500 lg:hidden"
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
               >
@@ -245,72 +246,96 @@ export default function Navbar({
             </div>
           )}
 
-          {isMenuOpen && (
-            <div
-              className="absolute left-2.5 right-2.5 top-full z-[80] mt-2 overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#151515] shadow-[0_24px_60px_rgba(0,0,0,0.45)] lg:hidden"
-              aria-label="Navigation menu"
-              role="dialog"
-              aria-modal="true"
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-[80] lg:hidden" aria-hidden="true">
+          <button
+            type="button"
+            onClick={closeAll}
+            className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+            aria-label="Close menu overlay"
+          />
+        </div>
+      )}
+
+      <div
+        className={`fixed right-0 top-0 z-[90] flex h-dvh w-[min(88vw,360px)] flex-col border-l border-white/10 bg-[#111111] shadow-[0_24px_60px_rgba(0,0,0,0.45)] transition-transform duration-300 ease-out lg:hidden ${
+          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        aria-label="Navigation menu"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-white/40">Menu</p>
+          <button
+            type="button"
+            onClick={closeAll}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05]"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="grid gap-1 overflow-y-auto p-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={closeAll}
+              className={`flex items-center rounded-xl px-4 py-3 text-sm transition ${
+                getIsActive(link.href)
+                  ? "bg-sky-600 text-white"
+                  : "text-white/75 hover:bg-white/[0.05] hover:text-white"
+              }`}
             >
-              <div className="grid gap-1 p-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={closeAll}
-                    className={`flex items-center rounded-xl px-4 py-3 text-sm transition ${
-                      getIsActive(link.href)
-                        ? "bg-sky-600 text-white"
-                        : "text-white/75 hover:bg-white/[0.05] hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              {link.label}
+            </Link>
+          ))}
 
-                <div className="my-2 border-t border-white/[0.07]" />
+          <div className="my-2 border-t border-white/[0.07]" />
 
-                {isLoggedIn ? (
-                  <>
-                    <Link
-                      href="/login?view=profile"
-                      onClick={closeAll}
-                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
-                    >
-                      <User className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{currentUser}</span>
-                    </Link>
-                    <Link
-                      href="/login?view=address"
-                      onClick={closeAll}
-                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
-                    >
-                      <MapPinned className="h-4 w-4 shrink-0" />
-                      Address
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleLogout();
-                        closeAll();
-                      }}
-                      className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.05] hover:text-red-200"
-                    >
-                      <LogOut className="h-4 w-4 shrink-0" />
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <Link
-                    href="/login"
-                    onClick={closeAll}
-                    className="flex items-center gap-3 rounded-xl border border-[#2f7ea1]/45 px-4 py-3 text-sm text-white/75 transition hover:border-[#2f7ea1] hover:bg-white/[0.05] hover:text-white"
-                  >
-                    <User className="h-4 w-4 shrink-0" />
-                    Login
-                  </Link>
-                )}
-              </div>
-            </div>
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/login?view=profile"
+                onClick={closeAll}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+              >
+                <User className="h-4 w-4 shrink-0" />
+                <span className="truncate">{currentUser}</span>
+              </Link>
+              <Link
+                href="/login?view=address"
+                onClick={closeAll}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+              >
+                <MapPinned className="h-4 w-4 shrink-0" />
+                Address
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  closeAll();
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.05] hover:text-red-200"
+              >
+                <LogOut className="h-4 w-4 shrink-0" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              onClick={closeAll}
+              className="flex items-center gap-3 rounded-xl border border-[#2f7ea1]/45 px-4 py-3 text-sm text-white/75 transition hover:border-[#2f7ea1] hover:bg-white/[0.05] hover:text-white"
+            >
+              <User className="h-4 w-4 shrink-0" />
+              Login
+            </Link>
           )}
         </div>
       </div>

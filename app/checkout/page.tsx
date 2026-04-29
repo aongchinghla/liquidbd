@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useAppContext } from "@/context/app-context";
 import { calculatePromoDiscount, normalizePromoCode } from "@/lib/checkout";
+import { getDiscountedPrice, hasProductDiscount } from "@/lib/products";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-BD", {
@@ -513,7 +514,11 @@ export default function CheckoutPage() {
               </div>
 
               <div className="max-h-[30rem] space-y-3 overflow-y-auto pr-1">
-                {cart.map((item) => (
+                {cart.map((item) => {
+                  const discountedPrice = getDiscountedPrice(item);
+                  const hasDiscount = hasProductDiscount(item);
+
+                  return (
                   <div key={item.cartItemId} className="rounded-xl border border-white/10 bg-black/20 p-3">
                     <div className="flex gap-3">
                       <img src={item.image} alt={item.name} className="h-16 w-14 rounded-lg object-cover" />
@@ -525,7 +530,12 @@ export default function CheckoutPage() {
                           {item.selectedColor ? ` | ${item.selectedColor}` : ""}
                         </p>
                       </div>
-                      <p className="text-sm font-semibold text-white/85">{formatPrice(item.price * item.quantity)}</p>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-white/85">{formatPrice(discountedPrice * item.quantity)}</p>
+                        {hasDiscount ? (
+                          <p className="text-xs text-white/35 line-through">{formatPrice(item.price * item.quantity)}</p>
+                        ) : null}
+                      </div>
                     </div>
 
                     <div className="mt-3 flex items-center justify-between">
@@ -548,7 +558,8 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </div>
 
               <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm">
