@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { getDiscountedPrice, Product } from "@/lib/products";
 import { CartItem } from "@/components/modals/cart-drawer";
 import { calculatePromoDiscount, CheckoutForm } from "@/lib/checkout";
+import { saveOrderToHistory } from "@/lib/orders";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import CartDrawer from "@/components/modals/cart-drawer";
@@ -213,19 +214,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const deliveryCharge = subtotal > 0 ? 80 : 0;
     const promo = calculatePromoDiscount(subtotal, checkoutForm.promoCode);
     const total = Math.max(subtotal + deliveryCharge - promo.discount, 0);
+    const orderRecord = {
+      orderId,
+      subtotal,
+      deliveryCharge,
+      total,
+      discount: promo.discount,
+      promoCode: promo.appliedPromoCode,
+      paymentMethod: checkoutForm.paymentMethod,
+      bkashSenderLast4: checkoutForm.bkashSenderLast4,
+      bkashTransactionId: checkoutForm.bkashTransactionId,
+      nagadSenderLast4: checkoutForm.nagadSenderLast4,
+      nagadTransactionId: checkoutForm.nagadTransactionId,
+      customerName: currentUser !== "Guest" ? currentUser : checkoutForm.name.trim() || "Guest",
+      customerEmail: checkoutForm.email.trim(),
+      items: cart.map((item) => ({
+        id: item.id,
+        cartItemId: item.cartItemId,
+        name: item.name,
+        price: item.price,
+        discountPercentage: item.discountPercentage,
+        productType: item.productType,
+        category: item.category,
+        image: item.image,
+        quantity: item.quantity,
+        selectedColor: item.selectedColor,
+        selectedSize: item.selectedSize,
+      })),
+      checkout: {
+        name: checkoutForm.name,
+        email: checkoutForm.email,
+        phone: checkoutForm.phone,
+        address: checkoutForm.address,
+      },
+      placedAt: new Date().toISOString(),
+    };
 
     localStorage.setItem(
       "liquid-last-order",
-      JSON.stringify({
-        orderId,
-        total,
-        discount: promo.discount,
-        promoCode: promo.appliedPromoCode,
-        items: cart,
-        checkout: checkoutForm,
-        placedAt: new Date().toISOString(),
-      })
+      JSON.stringify(orderRecord)
     );
+    saveOrderToHistory(orderRecord);
 
     clearCart();
     setIsCartOpen(false);

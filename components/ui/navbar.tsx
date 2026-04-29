@@ -138,19 +138,26 @@ export default function Navbar({
 
             <div className="flex items-center justify-self-end gap-2">
               <nav className="hidden items-center gap-2 lg:flex">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`rounded-full px-3 py-1.5 text-sm transition ${
-                      getIsActive(link.href)
-                        ? "bg-sky-600 text-white"
-                        : "text-white/70 hover:bg-white/[0.05] hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const isActive = getIsActive(link.href);
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`inline-flex flex-col items-center px-3 pt-1.5 pb-1 text-sm font-semibold transition ${
+                        isActive ? "text-[#2f7ea1]" : "text-white/70 hover:text-white"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <span
+                        className={`mt-0.5 h-0.5 rounded-full bg-[#2f7ea1] transition-all ${
+                          isActive ? "w-5 opacity-100" : "w-0 opacity-0"
+                        }`}
+                      />
+                    </Link>
+                  );
+                })}
               </nav>
 
               {isLoggedIn ? (
@@ -281,20 +288,27 @@ export default function Navbar({
         </div>
 
         <div className="grid gap-1 overflow-y-auto p-3">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={closeAll}
-              className={`flex items-center rounded-xl px-4 py-3 text-sm transition ${
-                getIsActive(link.href)
-                  ? "bg-sky-600 text-white"
-                  : "text-white/75 hover:bg-white/[0.05] hover:text-white"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = getIsActive(link.href);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={closeAll}
+                className={`inline-flex flex-col items-start px-4 pt-3 pb-2 text-sm font-semibold transition ${
+                  isActive ? "text-[#2f7ea1]" : "text-white/75 hover:text-white"
+                }`}
+              >
+                <span>{link.label}</span>
+                <span
+                  className={`mt-0.5 h-0.5 rounded-full bg-[#2f7ea1] transition-all ${
+                    isActive ? "w-5 opacity-100" : "w-0 opacity-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
 
           <div className="my-2 border-t border-white/[0.07]" />
 

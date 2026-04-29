@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Mail, Lock, LogIn, User, Phone, Eye, EyeOff, MapPinned, Save } from "lucide-react";
 import { gsap } from "gsap";
 import { useAppContext } from "@/context/app-context";
+import { getUserOrderHistory, OrderHistoryItem } from "@/lib/orders";
 
 interface AuthForm {
   name: string;
@@ -19,6 +20,22 @@ interface SavedUser {
   name?: string;
   email?: string;
   phone?: string;
+}
+
+function formatPrice(price: number) {
+  return new Intl.NumberFormat("en-BD", {
+    style: "currency",
+    currency: "BDT",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function formatOrderDate(date: string) {
+  return new Intl.DateTimeFormat("en-BD", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
 }
 
 function LoginContent() {
@@ -55,6 +72,8 @@ function LoginContent() {
   const [profileEmail, setProfileEmail] = React.useState("");
   const [profilePhone, setProfilePhone] = React.useState("");
   const [accountMessage, setAccountMessage] = React.useState("");
+  const [orders, setOrders] = React.useState<OrderHistoryItem[]>([]);
+  const [orderLookup, setOrderLookup] = React.useState({ name: "", email: "" });
   const accountView = searchParams.get("view") === "address" ? "address" : "profile";
 
   useEffect(() => {
@@ -120,11 +139,26 @@ function LoginContent() {
         setProfileName(parsed.name || "");
         setProfileEmail(parsed.email || "");
         setProfilePhone(parsed.phone || "");
+        setOrderLookup({
+          name: parsed.name || currentUser,
+          email: parsed.email || "",
+        });
       } catch (error) {
         console.error("Profile load error", error);
       }
+    } else {
+      setOrders([]);
     }
   }, [currentUser, isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setOrders([]);
+      return;
+    }
+
+    setOrders(getUserOrderHistory(orderLookup));
+  }, [isLoggedIn, orderLookup]);
 
   const handleAuthInput = (field: keyof AuthForm, value: string) => {
     setAuthForm((prev) => ({ ...prev, [field]: value }));
@@ -217,6 +251,10 @@ function LoginContent() {
 
     localStorage.setItem("liquid-user", JSON.stringify(user));
     setCurrentUser(trimmedName);
+    setOrderLookup({
+      name: trimmedName,
+      email: profileEmail.trim(),
+    });
     setAccountMessage("Profile saved successfully.");
   };
 
@@ -398,6 +436,73 @@ function LoginContent() {
               <Save className="h-4 w-4" />
               {accountView === "profile" ? "Save Profile" : "Save Address"}
             </button>
+
+            {accountView === "profile" ? (
+              <div className="mt-8 border-t border-white/10 pt-7">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-white/35">Order History</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-white">My Orders</h2>
+                  </div>
+                  <p className="text-sm text-white/45">
+                    {orders.length} order{orders.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+
+                {orders.length > 0 ? (
+                  <div className="mt-5 space-y-4">
+                    {orders.map((order) => (
+                      <article
+                        key={`${order.orderId}-${order.placedAt}`}
+                        className="rounded-2xl border border-white/10 bg-black/20 p-5"
+                      >
+                        <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Order ID</p>
+                            <h3 className="mt-1 text-lg font-semibold text-white">{order.orderId}</h3>
+                            <p className="mt-2 text-sm text-white/45">{formatOrderDate(order.placedAt)}</p>
+                          </div>
+                          <div className="sm:text-right">
+                            <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Total</p>
+                            <p className="mt-1 text-lg font-semibold text-white">{formatPrice(order.total)}</p>
+                            <p className="mt-2 text-sm text-white/45">{order.paymentMethod}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 space-y-3">
+                          {order.items.map((item) => (
+                            <div
+                              key={item.cartItemId}
+                              className="flex items-start justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3"
+                            >
+                              <div>
+                                <p className="text-sm font-medium text-white">{item.name}</p>
+                                <p className="mt-1 text-xs text-white/45">
+                                  {item.productType}
+                                  {item.category ? ` | ${item.category}` : ""}
+                                </p>
+                                {item.selectedSize || item.selectedColor ? (
+                                  <p className="mt-1 text-xs text-white/35">
+                                    {item.selectedSize ? `Size: ${item.selectedSize}` : ""}
+                                    {item.selectedSize && item.selectedColor ? " | " : ""}
+                                    {item.selectedColor ? `Color: ${item.selectedColor}` : ""}
+                                  </p>
+                                ) : null}
+                              </div>
+                              <p className="text-sm font-semibold text-white/85">x{item.quantity}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 px-5 py-6 text-sm text-white/55">
+                    You have no orders yet. After placing an order, it will appear here.
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
