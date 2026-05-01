@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
+  ChevronDown,
   Eye,
   EyeOff,
   Lock,
@@ -118,6 +119,7 @@ function LoginContent() {
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const [orders, setOrders] = React.useState<OrderHistoryItem[]>([]);
+  const [expandedOrderId, setExpandedOrderId] = React.useState<string | null>(null);
   const [orderLookup, setOrderLookup] = React.useState({ name: "", email: "" });
   const accountView = getAccountViewParam(searchParams.get("view"));
 
@@ -202,6 +204,7 @@ function LoginContent() {
   useEffect(() => {
     if (!isLoggedIn) {
       setOrders([]);
+      setExpandedOrderId(null);
       return;
     }
 
@@ -420,7 +423,7 @@ function LoginContent() {
       },
       {
         id: "orders",
-        label: "Orders",
+        label: "My Orders",
         href: "/login?view=orders",
         icon: <Package className="h-4 w-4" />,
         note: "Purchase history",
@@ -449,8 +452,8 @@ function LoginContent() {
             </h1>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
-            <aside className="rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-6">
+          <div className="grid items-start gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
+            <aside className="self-start rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-6">
               <div className="rounded-lg border border-white/10 bg-black/20 p-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] text-lg font-semibold text-white">
                   {(profileName || currentUser || "U").slice(0, 1).toUpperCase()}
@@ -494,7 +497,7 @@ function LoginContent() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-sm font-medium text-white/75 transition hover:border-white/20 hover:text-white"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/15 px-4 py-3 text-sm font-medium text-red-200 transition hover:border-red-500/50 hover:bg-red-500/20 hover:text-white"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -700,11 +703,7 @@ function LoginContent() {
 
               {accountView === "orders" ? (
                 <>
-                  <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.28em] text-white/35">Order History</p>
-                      <h3 className="mt-2 text-2xl font-semibold text-white">My Orders</h3>
-                    </div>
+                  <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-end">
                     <p className="text-sm text-white/45">
                       {orders.length} order{orders.length === 1 ? "" : "s"}
                     </p>
@@ -715,45 +714,132 @@ function LoginContent() {
                       {orders.map((order) => (
                         <article
                           key={`${order.orderId}-${order.placedAt}`}
-                          className="rounded-lg border border-white/10 bg-black/20 p-5"
+                          className="overflow-hidden rounded-lg border border-white/10 bg-black/20"
                         >
-                          <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div>
-                              <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Order ID</p>
-                              <h3 className="mt-1 text-lg font-semibold text-white">{order.orderId}</h3>
-                              <p className="mt-2 text-sm text-white/45">{formatOrderDate(order.placedAt)}</p>
-                            </div>
-                            <div className="sm:text-right">
-                              <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Total</p>
-                              <p className="mt-1 text-lg font-semibold text-white">{formatPrice(order.total)}</p>
-                              <p className="mt-2 text-sm text-white/45">{order.paymentMethod}</p>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 space-y-3">
-                            {order.items.map((item) => (
-                              <div
-                                key={item.cartItemId}
-                                className="flex items-start justify-between gap-3 rounded-lg border border-white/8 bg-white/[0.02] px-4 py-3"
-                              >
-                                <div>
-                                  <p className="text-sm font-medium text-white">{item.name}</p>
-                                  <p className="mt-1 text-xs text-white/45">
-                                    {item.productType}
-                                    {item.category ? ` | ${item.category}` : ""}
-                                  </p>
-                                  {item.selectedSize || item.selectedColor ? (
-                                    <p className="mt-1 text-xs text-white/35">
-                                      {item.selectedSize ? `Size: ${item.selectedSize}` : ""}
-                                      {item.selectedSize && item.selectedColor ? " | " : ""}
-                                      {item.selectedColor ? `Color: ${item.selectedColor}` : ""}
-                                    </p>
-                                  ) : null}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedOrderId((prev) =>
+                                prev === order.orderId ? null : order.orderId
+                              )
+                            }
+                            className="flex w-full items-center gap-4 bg-white/[0.02] px-5 py-4 text-left transition hover:bg-white/[0.04]"
+                            aria-expanded={expandedOrderId === order.orderId}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                                <div className="min-w-0">
+                                  <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Order ID</p>
+                                  <h3 className="mt-1 truncate text-base font-semibold text-white">
+                                    {order.orderId}
+                                  </h3>
                                 </div>
-                                <p className="text-sm font-semibold text-white/85">x{item.quantity}</p>
+
+                                <div className="grid gap-2 text-sm text-white/55 sm:grid-cols-3 sm:gap-6 lg:text-right">
+                                  <p>{formatOrderDate(order.placedAt)}</p>
+                                  <p>{order.items.length} item{order.items.length === 1 ? "" : "s"}</p>
+                                  <p className="font-semibold text-white">{formatPrice(order.total)}</p>
+                                </div>
                               </div>
-                            ))}
-                          </div>
+                            </div>
+
+                            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/65">
+                              <ChevronDown
+                                className={`h-4 w-4 transition-transform ${
+                                  expandedOrderId === order.orderId ? "rotate-180" : ""
+                                }`}
+                              />
+                            </span>
+                          </button>
+
+                          {expandedOrderId === order.orderId ? (
+                            <div className="border-t border-white/10">
+                              <div className="px-5 py-4">
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                  <div>
+                                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Payment Method</p>
+                                    <p className="mt-1 text-sm text-white/75">{order.paymentMethod}</p>
+                                  </div>
+
+                                  <div className="flex flex-wrap gap-2 lg:justify-end">
+                                    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                                      Delivery {formatPrice(order.deliveryCharge)}
+                                    </span>
+                                    {order.discount > 0 ? (
+                                      <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200">
+                                        Saved {formatPrice(order.discount)}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="space-y-3 px-5 py-4">
+                                {order.items.map((item) => (
+                                  <div
+                                    key={item.cartItemId}
+                                    className="flex items-start gap-3 rounded-lg border border-white/8 bg-white/[0.02] p-3"
+                                  >
+                                    <img
+                                      src={item.image}
+                                      alt={item.name}
+                                      className="h-16 w-14 rounded-lg object-cover"
+                                    />
+
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                          <p className="truncate text-sm font-medium text-white">{item.name}</p>
+                                          <p className="mt-1 text-xs text-white/45">
+                                            {item.productType}
+                                            {item.category ? ` | ${item.category}` : ""}
+                                          </p>
+                                          {item.selectedSize || item.selectedColor ? (
+                                            <p className="mt-1 text-xs text-white/35">
+                                              {item.selectedSize ? `Size: ${item.selectedSize}` : ""}
+                                              {item.selectedSize && item.selectedColor ? " | " : ""}
+                                              {item.selectedColor ? `Color: ${item.selectedColor}` : ""}
+                                            </p>
+                                          ) : null}
+                                        </div>
+
+                                        <div className="text-right">
+                                          <p className="text-sm font-semibold text-white/85">x{item.quantity}</p>
+                                          <p className="mt-1 text-xs text-white/45">{formatPrice(item.price)}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="border-t border-white/10 px-5 py-4">
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <div>
+                                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Delivery To</p>
+                                    <p className="mt-2 text-sm font-medium text-white/85">
+                                      {order.checkout.name || order.customerName}
+                                    </p>
+                                    <p className="mt-1 text-sm leading-6 text-white/50">
+                                      {order.checkout.address || "Address not available"}
+                                    </p>
+                                  </div>
+
+                                  <div className="md:text-right">
+                                    <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Payment Summary</p>
+                                    <p className="mt-2 text-sm text-white/55">
+                                      Subtotal: <span className="text-white/80">{formatPrice(order.subtotal)}</span>
+                                    </p>
+                                    {order.promoCode ? (
+                                      <p className="mt-1 text-sm text-white/55">
+                                        Promo: <span className="text-white/80">{order.promoCode}</span>
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : null}
                         </article>
                       ))}
                     </div>
