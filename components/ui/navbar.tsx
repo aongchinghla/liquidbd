@@ -246,7 +246,7 @@ export default function Navbar({
                 className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white text-black transition hover:opacity-90"
                 aria-label="Open cart"
               >
-                <ShoppingBag className="h-4 w-4" />
+                <ShoppingBag className="h-[18px] w-[18px] lg:h-4 lg:w-4" />
                 {cartCount > 0 && (
                   <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-[#242424] bg-red-500 px-1 text-[9px] font-bold leading-none text-white shadow-sm">
                     {cartCount}
@@ -260,14 +260,18 @@ export default function Navbar({
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
               >
-                {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                {isMenuOpen ? (
+                  <X className="h-[18px] w-[18px]" />
+                ) : (
+                  <Menu className="h-[18px] w-[18px]" />
+                )}
               </button>
             </div>
           </div>
 
           <div className="relative lg:hidden">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white/35" />
               <input
                 type="text"
                 placeholder="Search products..."
@@ -281,7 +285,7 @@ export default function Navbar({
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/35 transition hover:text-white"
                   aria-label="Clear search"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-[18px] w-[18px]" />
                 </button>
               )}
             </div>
@@ -328,7 +332,7 @@ export default function Navbar({
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white transition hover:border-white/20 hover:bg-white/[0.05]"
             aria-label="Close menu"
           >
-            <X className="h-4 w-4" />
+            <X className="h-[18px] w-[18px]" />
           </button>
         </div>
 
@@ -370,7 +374,7 @@ export default function Navbar({
                 }}
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
               >
-                <User className="h-4 w-4 shrink-0" />
+                <User className="h-[18px] w-[18px] shrink-0" />
                 <span className="truncate">{currentUser}</span>
               </Link>
               <Link
@@ -381,7 +385,7 @@ export default function Navbar({
                 }}
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
               >
-                <Package className="h-4 w-4 shrink-0" />
+                <Package className="h-[18px] w-[18px] shrink-0" />
                 My Orders
               </Link>
               <button
@@ -391,7 +395,7 @@ export default function Navbar({
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.05] hover:text-red-200"
               >
-                <LogOut className="h-4 w-4 shrink-0" />
+                <LogOut className="h-[18px] w-[18px] shrink-0" />
                 Logout
               </button>
             </>
@@ -404,7 +408,7 @@ export default function Navbar({
               }}
               className="flex items-center gap-3 rounded-xl border border-[#2f7ea1]/45 px-4 py-3 text-sm text-white/75 transition hover:border-[#2f7ea1] hover:bg-white/[0.05] hover:text-white"
             >
-              <User className="h-4 w-4 shrink-0" />
+              <User className="h-[18px] w-[18px] shrink-0" />
               Login
             </Link>
           )}
