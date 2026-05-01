@@ -60,7 +60,7 @@ export default function CartDrawer({
 
         <div className="mt-5 flex-1 space-y-2.5 overflow-y-auto pr-1 sm:mt-6 sm:space-y-3">
           {cart.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-white/60 sm:rounded-2xl sm:p-5">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm text-white/60 sm:p-5">
               Your cart is empty.
             </div>
           ) : (
@@ -71,7 +71,7 @@ export default function CartDrawer({
               return (
                 <div
                   key={item.cartItemId}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-2.5 sm:rounded-2xl sm:p-3"
+                  className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 sm:p-3"
                 >
                   <div className="flex gap-2.5 sm:gap-3">
                     <img
@@ -142,7 +142,7 @@ export default function CartDrawer({
           )}
         </div>
 
-        <div className="mt-5 shrink-0 rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-3.5 sm:mt-6 sm:rounded-[1.35rem] sm:p-4">
+        <div className="mt-5 shrink-0 rounded-lg border border-white/10 bg-white/[0.03] p-3.5 sm:mt-6 sm:p-4">
           <div className="mb-2 flex items-center justify-between text-sm text-white/70">
             <span>Subtotal</span>
             <span>{formatPrice(subtotal)}</span>

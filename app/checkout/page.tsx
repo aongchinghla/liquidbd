@@ -180,7 +180,7 @@ export default function CheckoutPage() {
         )}
 
         {!isReady ? (
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/20">
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/20">
             <p className="text-sm uppercase tracking-[0.3em] text-white/35">Loading checkout</p>
             <p className="mt-3 text-sm text-white/55">Bringing your saved cart and delivery info into place.</p>
           </div>
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                 We will contact you soon to confirm delivery.
               </p>
 
-              <div className="relative mx-auto mt-6 max-w-md rounded-xl border border-white/10 bg-black/25 px-5 py-4 text-left backdrop-blur-sm">
+              <div className="relative mx-auto mt-6 max-w-md rounded-lg border border-white/10 bg-black/25 px-5 py-4 text-left backdrop-blur-sm">
                 <p className="text-[11px] uppercase tracking-[0.28em] text-white/40">Payment Summary</p>
                 <div className="mt-3 space-y-3 border-t border-white/10 pt-3 text-sm text-white/65">
                   <div className="flex items-center justify-between">
@@ -263,7 +263,7 @@ export default function CheckoutPage() {
             </div>
           </div>
         ) : cart.length === 0 ? (
-          <div className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/20">
+          <div className="mx-auto max-w-2xl rounded-lg border border-white/10 bg-white/[0.03] p-8 text-center shadow-2xl shadow-black/20">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white/75">
               <ShoppingBag className="h-7 w-7" />
             </div>
@@ -281,7 +281,7 @@ export default function CheckoutPage() {
         ) : (
           <div className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
             <div className="space-y-5">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5 md:p-6">
                 <div className="mb-4 flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-white/55" />
                   <h3 className="font-semibold text-white">Delivery information</h3>
@@ -379,7 +379,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {isBkashSelected && (
-                    <div className="mt-4 rounded-2xl border border-[#E2136E]/20 bg-[#E2136E]/[0.06] p-4 md:p-5">
+                    <div className="mt-4 rounded-lg border border-[#E2136E]/20 bg-[#E2136E]/[0.06] p-4 md:p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="mt-0.5 rounded-full border border-[#E2136E]/20 bg-[#E2136E]/10 p-2 text-[#ff7db3]">
                           <BadgeInfo className="h-4 w-4" />
@@ -401,7 +401,7 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                      <div className="mt-4 rounded-lg border border-white/10 bg-black/25 px-4 py-3">
                         <p className="text-xs uppercase tracking-[0.24em] text-white/40">bKash Number</p>
                         <p className="mt-2 text-xl font-semibold tracking-wide text-white">{merchantBkashNumber}</p>
                       </div>
@@ -442,7 +442,7 @@ export default function CheckoutPage() {
                   )}
 
                   {isNagadSelected && (
-                    <div className="mt-4 rounded-2xl border border-[#F58220]/20 bg-[#F58220]/[0.08] p-4 md:p-5">
+                    <div className="mt-4 rounded-lg border border-[#F58220]/20 bg-[#F58220]/[0.08] p-4 md:p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="mt-0.5 rounded-full border border-[#F58220]/20 bg-[#F58220]/10 p-2 text-[#ffb067]">
                           <BadgeInfo className="h-4 w-4" />
@@ -464,7 +464,7 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 rounded-xl border border-white/10 bg-black/25 px-4 py-3">
+                      <div className="mt-4 rounded-lg border border-white/10 bg-black/25 px-4 py-3">
                         <p className="text-xs uppercase tracking-[0.24em] text-white/40">Nagad Number</p>
                         <p className="mt-2 text-xl font-semibold tracking-wide text-white">{merchantNagadNumber}</p>
                       </div>
@@ -507,7 +507,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5 md:p-6">
               <div className="mb-4 flex items-center gap-2">
                 <PackageCheck className="h-4 w-4 text-white/55" />
                 <h3 className="font-semibold text-white">Order summary</h3>
@@ -519,7 +519,7 @@ export default function CheckoutPage() {
                   const hasDiscount = hasProductDiscount(item);
 
                   return (
-                  <div key={item.cartItemId} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <div key={item.cartItemId} className="rounded-lg border border-white/10 bg-black/20 p-3">
                     <div className="flex gap-3">
                       <img src={item.image} alt={item.name} className="h-16 w-14 rounded-lg object-cover" />
                       <div className="min-w-0 flex-1">
@@ -563,7 +563,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="mt-5 space-y-3 border-t border-white/10 pt-5 text-sm">
-                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div className="rounded-lg border border-white/10 bg-black/20 p-4">
                   <div className="flex items-center gap-2">
                     <TicketPercent className="h-4 w-4 text-white/55" />
                     <p className="text-sm font-medium text-white">Promo code</p>

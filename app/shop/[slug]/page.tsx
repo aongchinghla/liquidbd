@@ -225,7 +225,7 @@ export default function ProductDetailsPage() {
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsZooming(true)}
             onMouseLeave={() => setIsZooming(false)}
-            className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] cursor-zoom-in"
+            className="relative aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] cursor-zoom-in"
           >
             <Image
               src={product.images[selectedIndex] || product.image}
@@ -452,7 +452,7 @@ export default function ProductDetailsPage() {
         </div>
       </div>
 
-      <section className="mt-16 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]">
+      <section className="mt-16 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
         <div className="flex overflow-x-auto bg-white/[0.02] px-4 sm:px-6">
           {PRODUCT_INFO_TABS.map((tab) => {
             const isActive = activeInfoTab === tab.id;
@@ -490,7 +490,7 @@ export default function ProductDetailsPage() {
             <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
               <form
                 onSubmit={handleReviewSubmit}
-                className="rounded-xl border border-white/10 bg-black/20 p-5"
+                className="rounded-lg border border-white/10 bg-black/20 p-5"
               >
                 <p className="text-[11px] uppercase tracking-[0.28em] text-white/35">Add Review</p>
                 <div className="mt-4 space-y-4">
@@ -573,7 +573,7 @@ export default function ProductDetailsPage() {
                   {displayedReviews.map((review, index) => (
                     <article
                       key={`${review.author}-${review.location}-${index}`}
-                      className="rounded-xl border border-white/10 bg-black/20 p-5"
+                      className="rounded-lg border border-white/10 bg-black/20 p-5"
                     >
                       <div className="flex items-center gap-1 text-white">
                         {REVIEW_STARS.map((star) => (

@@ -1,3 +1,5 @@
+"use client";
+
 import { Product } from "@/lib/products";
 import ProductCard from "@/components/ui/product-card";
 import Link from "next/link";
@@ -25,6 +27,7 @@ export default function ProductsSection({
   filteredProducts,
   addToCart,
 }: ProductsSectionProps) {
+
   return (
     <section id="featured" className="site-shell py-12 lg:py-16">
       <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">

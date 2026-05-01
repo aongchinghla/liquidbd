@@ -1,9 +1,22 @@
 "use client";
 
-import React, { useEffect, useRef, Suspense } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Mail, Lock, LogIn, User, Phone, Eye, EyeOff, MapPinned, Save } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  LogIn,
+  LogOut,
+  Mail,
+  MapPinned,
+  Package,
+  Phone,
+  Save,
+  Shield,
+  User,
+} from "lucide-react";
 import { gsap } from "gsap";
 import { useAppContext } from "@/context/app-context";
 import { getUserOrderHistory, OrderHistoryItem } from "@/lib/orders";
@@ -20,7 +33,10 @@ interface SavedUser {
   name?: string;
   email?: string;
   phone?: string;
+  password?: string;
 }
+
+type AccountView = "profile" | "address" | "security" | "orders";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-BD", {
@@ -38,6 +54,24 @@ function formatOrderDate(date: string) {
   }).format(new Date(date));
 }
 
+function getAccountViewParam(view: string | null): AccountView {
+  if (view === "address" || view === "security" || view === "orders") {
+    return view;
+  }
+
+  return "profile";
+}
+
+function getSavedUserFromStorage() {
+  try {
+    const savedUser = localStorage.getItem("liquid-user");
+    return savedUser ? (JSON.parse(savedUser) as SavedUser) : null;
+  } catch (error) {
+    console.error("Saved user read error", error);
+    return null;
+  }
+}
+
 function LoginContent() {
   const {
     setIsLoggedIn,
@@ -47,6 +81,7 @@ function LoginContent() {
     checkoutForm,
     handleCheckoutInput,
     handleCheckoutSave,
+    handleLogout,
   } = useAppContext();
 
   const [authMode, setAuthMode] = React.useState<"login" | "signup">("login");
@@ -68,13 +103,23 @@ function LoginContent() {
   const [resetLoading, setResetLoading] = React.useState(false);
   const [resetMessage, setResetMessage] = React.useState("");
   const [resetError, setResetError] = React.useState("");
+
   const [profileName, setProfileName] = React.useState("");
   const [profileEmail, setProfileEmail] = React.useState("");
   const [profilePhone, setProfilePhone] = React.useState("");
   const [accountMessage, setAccountMessage] = React.useState("");
+  const [securityMessage, setSecurityMessage] = React.useState("");
+  const [securityError, setSecurityError] = React.useState("");
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
+  const [showNewPassword, setShowNewPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
   const [orders, setOrders] = React.useState<OrderHistoryItem[]>([]);
   const [orderLookup, setOrderLookup] = React.useState({ name: "", email: "" });
-  const accountView = searchParams.get("view") === "address" ? "address" : "profile";
+  const accountView = getAccountViewParam(searchParams.get("view"));
 
   useEffect(() => {
     const mode = searchParams.get("mode");
@@ -83,7 +128,7 @@ function LoginContent() {
     } else {
       setAuthMode("login");
     }
-  }, [searchParams, setAuthMode]);
+  }, [searchParams]);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -127,28 +172,31 @@ function LoginContent() {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      try {
-        const savedUser = localStorage.getItem("liquid-user");
-        if (!savedUser) {
-          setProfileName(currentUser === "Guest" ? "" : currentUser);
-          return;
-        }
+    setAccountMessage("");
+    setSecurityMessage("");
+    setSecurityError("");
+  }, [accountView]);
 
-        const parsed: SavedUser = JSON.parse(savedUser);
-        setProfileName(parsed.name || "");
-        setProfileEmail(parsed.email || "");
-        setProfilePhone(parsed.phone || "");
-        setOrderLookup({
-          name: parsed.name || currentUser,
-          email: parsed.email || "",
-        });
-      } catch (error) {
-        console.error("Profile load error", error);
+  useEffect(() => {
+    if (isLoggedIn) {
+      const parsed = getSavedUserFromStorage();
+
+      if (!parsed) {
+        setProfileName(currentUser === "Guest" ? "" : currentUser);
+        return;
       }
-    } else {
-      setOrders([]);
+
+      setProfileName(parsed.name || "");
+      setProfileEmail(parsed.email || "");
+      setProfilePhone(parsed.phone || "");
+      setOrderLookup({
+        name: parsed.name || currentUser,
+        email: parsed.email || "",
+      });
+      return;
     }
+
+    setOrders([]);
   }, [currentUser, isLoggedIn]);
 
   useEffect(() => {
@@ -168,12 +216,14 @@ function LoginContent() {
     setAuthForm({ name: "", email: "", password: "", phone: "" });
   };
 
-  const saveUserSession = (name: string, email = "", phone = "") => {
-    const user = {
+  const saveUserSession = (name: string, email = "", phone = "", password = "") => {
+    const existingUser = getSavedUserFromStorage();
+    const user: SavedUser = {
       isLoggedIn: true,
       name,
       email,
       phone,
+      password: password || existingUser?.password || "",
     };
 
     localStorage.setItem("liquid-user", JSON.stringify(user));
@@ -200,13 +250,32 @@ function LoginContent() {
         return;
       }
 
-      saveUserSession(authForm.name, authForm.email, authForm.phone);
+      saveUserSession(authForm.name, authForm.email.trim(), authForm.phone.trim(), authForm.password);
       resetAuthForm();
       return;
     }
 
-    const loginName = authForm.email.split("@")[0] || "Customer";
-    saveUserSession(loginName, authForm.email);
+    const savedUser = getSavedUserFromStorage();
+    const trimmedEmail = authForm.email.trim().toLowerCase();
+
+    if (savedUser?.email?.trim().toLowerCase() === trimmedEmail && savedUser.password) {
+      if (savedUser.password !== authForm.password) {
+        setAuthError("Incorrect password. Please try again.");
+        return;
+      }
+
+      saveUserSession(
+        savedUser.name || (trimmedEmail.split("@")[0] || "Customer"),
+        savedUser.email || trimmedEmail,
+        savedUser.phone || "",
+        savedUser.password
+      );
+      resetAuthForm();
+      return;
+    }
+
+    const loginName = trimmedEmail.split("@")[0] || "Customer";
+    saveUserSession(loginName, trimmedEmail);
     resetAuthForm();
   };
 
@@ -242,11 +311,13 @@ function LoginContent() {
 
   const handleProfileSave = () => {
     const trimmedName = profileName.trim() || "Customer";
-    const user = {
+    const existingUser = getSavedUserFromStorage();
+    const user: SavedUser = {
       isLoggedIn: true,
       name: trimmedName,
       email: profileEmail.trim(),
       phone: profilePhone.trim(),
+      password: existingUser?.password || "",
     };
 
     localStorage.setItem("liquid-user", JSON.stringify(user));
@@ -263,6 +334,48 @@ function LoginContent() {
     setAccountMessage("Address saved successfully.");
   };
 
+  const handlePasswordSave = () => {
+    setSecurityMessage("");
+    setSecurityError("");
+
+    const savedUser = getSavedUserFromStorage();
+    const existingPassword = savedUser?.password?.trim() || "";
+
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      setSecurityError("New password and confirm password are required.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setSecurityError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (existingPassword && currentPassword !== existingPassword) {
+      setSecurityError("Current password did not match.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setSecurityError("New password and confirm password must match.");
+      return;
+    }
+
+    const updatedUser: SavedUser = {
+      isLoggedIn: true,
+      name: savedUser?.name || profileName.trim() || currentUser,
+      email: savedUser?.email || profileEmail.trim(),
+      phone: savedUser?.phone || profilePhone.trim(),
+      password: newPassword,
+    };
+
+    localStorage.setItem("liquid-user", JSON.stringify(updatedUser));
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setSecurityMessage(existingPassword ? "Password changed successfully." : "Password set successfully.");
+  };
+
   const onForgotPassword = async () => {
     setResetMessage("");
     setResetError("");
@@ -277,15 +390,50 @@ function LoginContent() {
       await handleForgotPassword(authForm.email.trim());
       setResetMessage("Password reset link sent to your email.");
     } catch (error) {
-      setResetError(
-        error instanceof Error ? error.message : "Failed to send reset link."
-      );
+      setResetError(error instanceof Error ? error.message : "Failed to send reset link.");
     } finally {
       setResetLoading(false);
     }
   };
 
   if (isLoggedIn) {
+    const accountSections: Array<{
+      id: AccountView;
+      label: string;
+      href: string;
+      icon: React.ReactNode;
+      note: string;
+    }> = [
+      {
+        id: "profile",
+        label: "My Profile",
+        href: "/login?view=profile",
+        icon: <User className="h-4 w-4" />,
+        note: "Basic account details",
+      },
+      {
+        id: "address",
+        label: "Address",
+        href: "/login?view=address",
+        icon: <MapPinned className="h-4 w-4" />,
+        note: "Delivery information",
+      },
+      {
+        id: "orders",
+        label: "Orders",
+        href: "/login?view=orders",
+        icon: <Package className="h-4 w-4" />,
+        note: "Purchase history",
+      },
+      {
+        id: "security",
+        label: "Security",
+        href: "/login?view=security",
+        icon: <Shield className="h-4 w-4" />,
+        note: "Password settings",
+      },
+    ];
+
     return (
       <div className="relative min-h-screen w-full overflow-hidden bg-neutral-950 px-4 py-10 md:px-6 lg:px-10">
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -293,216 +441,368 @@ function LoginContent() {
           <div className="absolute -right-[10%] -bottom-[10%] h-[40%] w-[40%] rounded-full bg-blue-900/10 blur-[120px]" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-[900px]">
+        <div className="relative z-10 mx-auto max-w-[1180px]">
           <div className="mb-8">
             <p className="text-xs uppercase tracking-[0.35em] text-white/40">Account</p>
             <h1 className="mt-3 text-3xl font-semibold text-white md:text-5xl">
-              {accountView === "address" ? "Address" : "My Profile"}
+              Dashboard
             </h1>
           </div>
 
-          <div className="mb-6 flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
-            <Link
-              href="/login?view=profile"
-              onClick={() => setAccountMessage("")}
-              className={`flex-1 rounded-lg px-4 py-3 text-center text-xs font-bold uppercase tracking-widest transition ${
-                accountView === "profile" ? "bg-white text-black" : "text-white/50 hover:text-white"
-              }`}
-            >
-              My Profile
-            </Link>
-            <Link
-              href="/login?view=address"
-              onClick={() => setAccountMessage("")}
-              className={`flex-1 rounded-lg px-4 py-3 text-center text-xs font-bold uppercase tracking-widest transition ${
-                accountView === "address" ? "bg-white text-black" : "text-white/50 hover:text-white"
-              }`}
-            >
-              Address
-            </Link>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-7">
-            {accountView === "profile" ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Full name</span>
-                  <span className="relative block">
-                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      value={profileName}
-                      onChange={(e) => setProfileName(e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="Your name"
-                    />
-                  </span>
-                </label>
-
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Email</span>
-                  <span className="relative block">
-                    <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      type="email"
-                      value={profileEmail}
-                      onChange={(e) => setProfileEmail(e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="hello@example.com"
-                    />
-                  </span>
-                </label>
-
-                <label className="space-y-2 md:col-span-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Phone</span>
-                  <span className="relative block">
-                    <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      value={profilePhone}
-                      onChange={(e) => setProfilePhone(e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="+880 1XXX XXXXXX"
-                    />
-                  </span>
-                </label>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Receiver name</span>
-                  <span className="relative block">
-                    <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      value={checkoutForm.name}
-                      onChange={(e) => handleCheckoutInput("name", e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="Full name"
-                    />
-                  </span>
-                </label>
-
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Email address</span>
-                  <span className="relative block">
-                    <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      type="email"
-                      value={checkoutForm.email}
-                      onChange={(e) => handleCheckoutInput("email", e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="hello@example.com"
-                    />
-                  </span>
-                </label>
-
-                <label className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Phone number</span>
-                  <span className="relative block">
-                    <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-                    <input
-                      value={checkoutForm.phone}
-                      onChange={(e) => handleCheckoutInput("phone", e.target.value)}
-                      className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
-                      placeholder="+880 1XXX XXXXXX"
-                    />
-                  </span>
-                </label>
-
-                <label className="space-y-2 md:col-span-2">
-                  <span className="text-xs uppercase tracking-widest text-white/35">Delivery address</span>
-                  <span className="relative block">
-                    <MapPinned className="absolute left-4 top-4 h-4 w-4 text-white/30" />
-                    <textarea
-                      value={checkoutForm.address}
-                      onChange={(e) => handleCheckoutInput("address", e.target.value)}
-                      rows={5}
-                      className="w-full resize-none rounded-xl border border-white/10 bg-black/20 py-3 pl-11 pr-4 text-sm leading-6 text-white outline-none transition focus:border-white/25"
-                      placeholder="House, road, area, city"
-                    />
-                  </span>
-                </label>
-              </div>
-            )}
-
-            {accountMessage && (
-              <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-                {accountMessage}
-              </div>
-            )}
-
-            <button
-              onClick={accountView === "profile" ? handleProfileSave : handleAddressSave}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
-            >
-              <Save className="h-4 w-4" />
-              {accountView === "profile" ? "Save Profile" : "Save Address"}
-            </button>
-
-            {accountView === "profile" ? (
-              <div className="mt-8 border-t border-white/10 pt-7">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/35">Order History</p>
-                    <h2 className="mt-2 text-2xl font-semibold text-white">My Orders</h2>
-                  </div>
-                  <p className="text-sm text-white/45">
-                    {orders.length} order{orders.length === 1 ? "" : "s"}
-                  </p>
+          <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
+            <aside className="rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-6">
+              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] text-lg font-semibold text-white">
+                  {(profileName || currentUser || "U").slice(0, 1).toUpperCase()}
                 </div>
-
-                {orders.length > 0 ? (
-                  <div className="mt-5 space-y-4">
-                    {orders.map((order) => (
-                      <article
-                        key={`${order.orderId}-${order.placedAt}`}
-                        className="rounded-2xl border border-white/10 bg-black/20 p-5"
-                      >
-                        <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-start sm:justify-between">
-                          <div>
-                            <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Order ID</p>
-                            <h3 className="mt-1 text-lg font-semibold text-white">{order.orderId}</h3>
-                            <p className="mt-2 text-sm text-white/45">{formatOrderDate(order.placedAt)}</p>
-                          </div>
-                          <div className="sm:text-right">
-                            <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Total</p>
-                            <p className="mt-1 text-lg font-semibold text-white">{formatPrice(order.total)}</p>
-                            <p className="mt-2 text-sm text-white/45">{order.paymentMethod}</p>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 space-y-3">
-                          {order.items.map((item) => (
-                            <div
-                              key={item.cartItemId}
-                              className="flex items-start justify-between gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3"
-                            >
-                              <div>
-                                <p className="text-sm font-medium text-white">{item.name}</p>
-                                <p className="mt-1 text-xs text-white/45">
-                                  {item.productType}
-                                  {item.category ? ` | ${item.category}` : ""}
-                                </p>
-                                {item.selectedSize || item.selectedColor ? (
-                                  <p className="mt-1 text-xs text-white/35">
-                                    {item.selectedSize ? `Size: ${item.selectedSize}` : ""}
-                                    {item.selectedSize && item.selectedColor ? " | " : ""}
-                                    {item.selectedColor ? `Color: ${item.selectedColor}` : ""}
-                                  </p>
-                                ) : null}
-                              </div>
-                              <p className="text-sm font-semibold text-white/85">x{item.quantity}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 px-5 py-6 text-sm text-white/55">
-                    You have no orders yet. After placing an order, it will appear here.
-                  </div>
-                )}
+                <h2 className="mt-4 text-xl font-semibold text-white">
+                  {profileName || currentUser}
+                </h2>
+                <p className="mt-1 text-sm text-white/50">
+                  {profileEmail || "No email saved yet"}
+                </p>
               </div>
-            ) : null}
+
+              <div className="mt-5 space-y-2">
+                {accountSections.map((section) => (
+                  <Link
+                    key={section.id}
+                    href={section.href}
+                    className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 transition ${
+                      accountView === section.id
+                        ? "border-white bg-white text-black"
+                        : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span>{section.icon}</span>
+                      <div>
+                        <p className="text-sm font-semibold">{section.label}</p>
+                        <p
+                          className={`text-[11px] ${
+                            accountView === section.id ? "text-black/60" : "text-white/35"
+                          }`}
+                        >
+                          {section.note}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-sm font-medium text-white/75 transition hover:border-white/20 hover:text-white"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </aside>
+
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl md:p-7">
+              <div className="mb-6 border-b border-white/10 pb-5">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/35">Dashboard</p>
+                <h2 className="mt-3 text-2xl font-semibold text-white md:text-3xl">
+                  {accountView === "profile"
+                    ? "Profile Details"
+                    : accountView === "address"
+                      ? "Saved Address"
+                      : accountView === "security"
+                        ? "Security Settings"
+                        : "Order History"}
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/50">
+                  {accountView === "profile"
+                    ? "Update your main account details so your Liquid profile stays current."
+                    : accountView === "address"
+                      ? "Save delivery details for a faster checkout experience."
+                      : accountView === "security"
+                        ? "Change or set your account password from here."
+                        : "Review your latest purchases and order details."}
+                </p>
+              </div>
+
+              {accountView === "profile" ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Full name</span>
+                    <span className="relative block">
+                      <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="Your name"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Email</span>
+                    <span className="relative block">
+                      <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        type="email"
+                        value={profileEmail}
+                        onChange={(e) => setProfileEmail(e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="hello@example.com"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="space-y-2 md:col-span-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Phone</span>
+                    <span className="relative block">
+                      <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        value={profilePhone}
+                        onChange={(e) => setProfilePhone(e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="+880 1XXX XXXXXX"
+                      />
+                    </span>
+                  </label>
+                </div>
+              ) : null}
+
+              {accountView === "address" ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Receiver name</span>
+                    <span className="relative block">
+                      <User className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        value={checkoutForm.name}
+                        onChange={(e) => handleCheckoutInput("name", e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="Full name"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Email address</span>
+                    <span className="relative block">
+                      <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        type="email"
+                        value={checkoutForm.email}
+                        onChange={(e) => handleCheckoutInput("email", e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="hello@example.com"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Phone number</span>
+                    <span className="relative block">
+                      <Phone className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        value={checkoutForm.phone}
+                        onChange={(e) => handleCheckoutInput("phone", e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="+880 1XXX XXXXXX"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="space-y-2 md:col-span-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Delivery address</span>
+                    <span className="relative block">
+                      <MapPinned className="absolute left-4 top-4 h-4 w-4 text-white/30" />
+                      <textarea
+                        value={checkoutForm.address}
+                        onChange={(e) => handleCheckoutInput("address", e.target.value)}
+                        rows={5}
+                        className="w-full resize-none rounded-lg border border-white/10 bg-black/20 py-3 pl-11 pr-4 text-sm leading-6 text-white outline-none transition focus:border-white/25"
+                        placeholder="House, road, area, city"
+                      />
+                    </span>
+                  </label>
+                </div>
+              ) : null}
+
+              {accountView === "security" ? (
+                <div className="space-y-4">
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">Current password</span>
+                    <span className="relative block">
+                      <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-12 text-sm text-white outline-none transition focus:border-white/25"
+                        placeholder="Enter current password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword((prev) => !prev)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 transition hover:text-white/55"
+                        aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </span>
+                  </label>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className="space-y-2">
+                      <span className="text-xs uppercase tracking-widest text-white/35">New password</span>
+                      <span className="relative block">
+                        <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-12 text-sm text-white outline-none transition focus:border-white/25"
+                          placeholder="Minimum 6 characters"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword((prev) => !prev)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 transition hover:text-white/55"
+                          aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                        >
+                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </span>
+                    </label>
+
+                    <label className="space-y-2">
+                      <span className="text-xs uppercase tracking-widest text-white/35">Confirm password</span>
+                      <span className="relative block">
+                        <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="h-12 w-full rounded-lg border border-white/10 bg-black/20 pl-11 pr-12 text-sm text-white outline-none transition focus:border-white/25"
+                          placeholder="Retype new password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/25 transition hover:text-white/55"
+                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              ) : null}
+
+              {accountView === "orders" ? (
+                <>
+                  <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.28em] text-white/35">Order History</p>
+                      <h3 className="mt-2 text-2xl font-semibold text-white">My Orders</h3>
+                    </div>
+                    <p className="text-sm text-white/45">
+                      {orders.length} order{orders.length === 1 ? "" : "s"}
+                    </p>
+                  </div>
+
+                  {orders.length > 0 ? (
+                    <div className="space-y-4">
+                      {orders.map((order) => (
+                        <article
+                          key={`${order.orderId}-${order.placedAt}`}
+                          className="rounded-lg border border-white/10 bg-black/20 p-5"
+                        >
+                          <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Order ID</p>
+                              <h3 className="mt-1 text-lg font-semibold text-white">{order.orderId}</h3>
+                              <p className="mt-2 text-sm text-white/45">{formatOrderDate(order.placedAt)}</p>
+                            </div>
+                            <div className="sm:text-right">
+                              <p className="text-[11px] uppercase tracking-[0.24em] text-white/35">Total</p>
+                              <p className="mt-1 text-lg font-semibold text-white">{formatPrice(order.total)}</p>
+                              <p className="mt-2 text-sm text-white/45">{order.paymentMethod}</p>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 space-y-3">
+                            {order.items.map((item) => (
+                              <div
+                                key={item.cartItemId}
+                                className="flex items-start justify-between gap-3 rounded-lg border border-white/8 bg-white/[0.02] px-4 py-3"
+                              >
+                                <div>
+                                  <p className="text-sm font-medium text-white">{item.name}</p>
+                                  <p className="mt-1 text-xs text-white/45">
+                                    {item.productType}
+                                    {item.category ? ` | ${item.category}` : ""}
+                                  </p>
+                                  {item.selectedSize || item.selectedColor ? (
+                                    <p className="mt-1 text-xs text-white/35">
+                                      {item.selectedSize ? `Size: ${item.selectedSize}` : ""}
+                                      {item.selectedSize && item.selectedColor ? " | " : ""}
+                                      {item.selectedColor ? `Color: ${item.selectedColor}` : ""}
+                                    </p>
+                                  ) : null}
+                                </div>
+                                <p className="text-sm font-semibold text-white/85">x{item.quantity}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-white/10 bg-black/20 px-5 py-6 text-sm text-white/55">
+                      You have no orders yet. After placing an order, it will appear here.
+                    </div>
+                  )}
+                </>
+              ) : null}
+
+              {accountMessage && (
+                <div className="mt-5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                  {accountMessage}
+                </div>
+              )}
+
+              {securityMessage && (
+                <div className="mt-5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                  {securityMessage}
+                </div>
+              )}
+
+              {securityError && (
+                <div className="mt-5 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {securityError}
+                </div>
+              )}
+
+              {accountView !== "orders" ? (
+                <button
+                  onClick={
+                    accountView === "profile"
+                      ? handleProfileSave
+                      : accountView === "address"
+                        ? handleAddressSave
+                        : handlePasswordSave
+                  }
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                >
+                  <Save className="h-4 w-4" />
+                  {accountView === "profile"
+                    ? "Save Profile"
+                    : accountView === "address"
+                      ? "Save Address"
+                      : "Update Password"}
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
@@ -521,12 +821,12 @@ function LoginContent() {
 
       <div
         ref={cardRef}
-        className="relative z-10 w-full max-w-[500px] rounded-[16px] border border-white/10 bg-white/[0.03] px-6 py-7 backdrop-blur-xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] md:px-8 md:py-8"
+        className="relative z-10 w-full max-w-[500px] rounded-lg border border-white/10 bg-white/[0.03] px-6 py-7 backdrop-blur-xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] md:px-8 md:py-8"
       >
         <div className="mb-7 text-center md:mb-8">
           <div
             ref={addToRefs}
-            className="mb-3 inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] p-3 shadow-inner"
+            className="mb-3 inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] p-3 shadow-inner"
           >
             {authMode === "login" ? (
               <LogIn className="h-6 w-6 text-[#2f7ea1]" />
@@ -557,10 +857,9 @@ function LoginContent() {
               setResetMessage("");
               setResetError("");
             }}
-            className={`flex-1 rounded-[6px] py-2 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${authMode === "login"
-                ? "bg-white text-black shadow-lg"
-                : "text-white/40 hover:text-white"
-              }`}
+            className={`flex-1 rounded-[6px] py-2 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+              authMode === "login" ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"
+            }`}
           >
             Login
           </button>
@@ -572,17 +871,16 @@ function LoginContent() {
               setResetMessage("");
               setResetError("");
             }}
-            className={`flex-1 rounded-[6px] py-2 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${authMode === "signup"
-                ? "bg-white text-black shadow-lg"
-                : "text-white/40 hover:text-white"
-              }`}
+            className={`flex-1 rounded-[6px] py-2 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+              authMode === "signup" ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white"
+            }`}
           >
             Sign Up
           </button>
         </div>
 
         <div className="space-y-4">
-          {authMode === "signup" && (
+          {authMode === "signup" ? (
             <>
               <div ref={addToRefs} className="space-y-2">
                 <label className="ml-1 text-[11px] font-bold uppercase tracking-widest text-white/30">
@@ -620,7 +918,7 @@ function LoginContent() {
                 </div>
               </div>
             </>
-          )}
+          ) : null}
 
           <div ref={addToRefs} className="space-y-2">
             <label className="ml-1 text-[11px] font-bold uppercase tracking-widest text-white/30">
@@ -646,7 +944,7 @@ function LoginContent() {
                 Password
               </label>
 
-              {authMode === "login" && (
+              {authMode === "login" ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -658,7 +956,7 @@ function LoginContent() {
                 >
                   Forgot?
                 </button>
-              )}
+              ) : null}
             </div>
 
             <div className="group relative">
@@ -676,7 +974,7 @@ function LoginContent() {
 
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 transition-colors hover:text-white/40"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
@@ -685,10 +983,10 @@ function LoginContent() {
             </div>
           </div>
 
-          {authMode === "login" && showForgotPassword && (
+          {authMode === "login" && showForgotPassword ? (
             <div
               ref={addToRefs}
-              className="rounded-[10px] border border-white/10 bg-white/[0.03] p-4"
+              className="rounded-lg border border-white/10 bg-white/[0.03] p-4"
             >
               <p className="mb-3 text-[12px] text-white/60">
                 Enter your email and we will send you a password reset link.
@@ -703,28 +1001,28 @@ function LoginContent() {
                 {resetLoading ? "Sending..." : "Send reset link"}
               </button>
 
-              {resetMessage && (
+              {resetMessage ? (
                 <div className="mt-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-[12px] font-medium text-emerald-200">
                   {resetMessage}
                 </div>
-              )}
+              ) : null}
 
-              {resetError && (
+              {resetError ? (
                 <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-[12px] font-medium text-red-200">
                   {resetError}
                 </div>
-              )}
+              ) : null}
             </div>
-          )}
+          ) : null}
 
-          {authError && (
+          {authError ? (
             <div
               ref={addToRefs}
               className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-[12px] font-medium text-red-200"
             >
               {authError}
             </div>
-          )}
+          ) : null}
 
           <button
             ref={addToRefs}
@@ -744,7 +1042,7 @@ function LoginContent() {
         <div className="mt-6">
           <div ref={addToRefs} className="relative flex items-center justify-center py-3">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5"></div>
+              <div className="w-full border-t border-white/5" />
             </div>
             <span className="relative z-10 bg-[#0c0c0c] px-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
               OR CONTINUE WITH
@@ -833,7 +1131,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-neutral-950 flex items-center justify-center"><div className="text-white font-bold opacity-20 uppercase tracking-[0.5em]">Loading...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-neutral-950">
+          <div className="font-bold uppercase tracking-[0.5em] text-white opacity-20">Loading...</div>
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

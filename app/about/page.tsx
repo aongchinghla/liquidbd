@@ -274,7 +274,7 @@ export default function AboutPage() {
       <div className="site-shell space-y-8 py-12 md:space-y-12 md:py-16">
         <section className="py-8 md:py-10">
           <div className="grid items-center gap-10 md:grid-cols-2">
-            <div className="relative min-h-[520px] overflow-hidden rounded-[4px] border border-white/10 order-1">
+            <div className="relative order-1 min-h-[520px] overflow-hidden rounded-lg border border-white/10">
               <Image
                 src="/about/about-us.jpg"
                 alt="The Beginning of Liquid"
@@ -340,7 +340,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {team.map((member, index) => (
               <div key={index} className="flex flex-col group text-center">
-                <div className="relative aspect-[4/4.5] w-full overflow-hidden rounded-[4px] border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all duration-500">
+                <div className="relative aspect-[4/4.5] w-full overflow-hidden rounded-lg border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.4)] transition-all duration-500">
                   <Image
                     src={member.image}
                     alt={member.name}

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LogOut, MapPinned, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ChevronDown, LogOut, Menu, Package, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { products, Product } from "@/lib/products";
 
@@ -20,6 +20,7 @@ interface NavbarProps {
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
+  { label: "Journal", href: "/journal" },
   { label: "About Us", href: "/about" },
 ];
 
@@ -33,9 +34,13 @@ export default function Navbar({
   setIsCartOpen,
 }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -57,7 +62,16 @@ export default function Navbar({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (shellRef.current && !shellRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const isInsideShell = shellRef.current?.contains(target);
+      const isInsideMobileMenu = mobileMenuRef.current?.contains(target);
+      const isInsideProfileMenu = profileMenuRef.current?.contains(target);
+
+      if (!isInsideProfileMenu) {
+        setIsProfileMenuOpen(false);
+      }
+
+      if (!isInsideShell && !isInsideMobileMenu) {
         setSearchQuery("");
         setIsMenuOpen(false);
       }
@@ -72,6 +86,7 @@ export default function Navbar({
       if (event.key === "Escape") {
         setSearchQuery("");
         setIsMenuOpen(false);
+        setIsProfileMenuOpen(false);
       }
     };
 
@@ -82,6 +97,12 @@ export default function Navbar({
   const closeAll = () => {
     setSearchQuery("");
     setIsMenuOpen(false);
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleMobileNavigate = (href: string) => {
+    closeAll();
+    router.push(href);
   };
 
   const getIsActive = (href: string) =>
@@ -161,13 +182,55 @@ export default function Navbar({
               </nav>
 
               {isLoggedIn ? (
-                <Link
-                  href="/login?view=profile"
-                  className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-white/20 hover:text-white md:inline-flex"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="max-w-[120px] truncate">{currentUser}</span>
-                </Link>
+                <div ref={profileMenuRef} className="relative hidden md:block">
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/85 transition hover:border-white/20 hover:text-white"
+                    aria-label="Open profile menu"
+                    aria-expanded={isProfileMenuOpen}
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="max-w-[120px] truncate">{currentUser}</span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-white/45 transition-transform ${
+                        isProfileMenuOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isProfileMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+0.6rem)] z-[75] min-w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-[#151515] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+                      <Link
+                        href="/login?view=profile"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+                      >
+                        <User className="h-4 w-4 shrink-0" />
+                        <span>My Profile</span>
+                      </Link>
+                      <Link
+                        href="/login?view=orders"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
+                      >
+                        <Package className="h-4 w-4 shrink-0" />
+                        <span>My Orders</span>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm text-red-300 transition hover:bg-white/[0.05] hover:text-red-200"
+                      >
+                        <LogOut className="h-4 w-4 shrink-0" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Link
                   href="/login"
@@ -234,25 +297,6 @@ export default function Navbar({
             )}
           </div>
 
-          {isLoggedIn && (
-            <div className="hidden items-center justify-end gap-2 border-t border-white/10 pt-2 md:flex lg:hidden">
-              <Link
-                href="/login?view=address"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/55 transition hover:border-white/20 hover:text-white"
-              >
-                <MapPinned className="h-3.5 w-3.5" />
-                Address
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-red-300 transition hover:border-white/20 hover:text-red-200"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                Logout
-              </button>
-            </div>
-          )}
-
         </div>
       </div>
 
@@ -268,6 +312,7 @@ export default function Navbar({
       )}
 
       <div
+        ref={mobileMenuRef}
         className={`fixed right-0 top-0 z-[90] flex h-dvh w-[min(88vw,360px)] flex-col border-l border-white/10 bg-[#111111] shadow-[0_24px_60px_rgba(0,0,0,0.45)] lg:hidden ${
           isMenuOpen ? "block" : "hidden"
         }`}
@@ -295,7 +340,10 @@ export default function Navbar({
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={closeAll}
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleMobileNavigate(link.href);
+                }}
                 className={`inline-flex flex-col items-start px-4 pt-3 pb-2 text-sm font-semibold transition ${
                   isActive ? "text-[#2f7ea1]" : "text-white/75 hover:text-white"
                 }`}
@@ -316,19 +364,25 @@ export default function Navbar({
             <>
               <Link
                 href="/login?view=profile"
-                onClick={closeAll}
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleMobileNavigate("/login?view=profile");
+                }}
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
               >
                 <User className="h-4 w-4 shrink-0" />
                 <span className="truncate">{currentUser}</span>
               </Link>
               <Link
-                href="/login?view=address"
-                onClick={closeAll}
+                href="/login?view=orders"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleMobileNavigate("/login?view=orders");
+                }}
                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/[0.05] hover:text-white"
               >
-                <MapPinned className="h-4 w-4 shrink-0" />
-                Address
+                <Package className="h-4 w-4 shrink-0" />
+                My Orders
               </Link>
               <button
                 onClick={() => {
@@ -344,7 +398,10 @@ export default function Navbar({
           ) : (
             <Link
               href="/login"
-              onClick={closeAll}
+              onClick={(event) => {
+                event.preventDefault();
+                handleMobileNavigate("/login");
+              }}
               className="flex items-center gap-3 rounded-xl border border-[#2f7ea1]/45 px-4 py-3 text-sm text-white/75 transition hover:border-[#2f7ea1] hover:bg-white/[0.05] hover:text-white"
             >
               <User className="h-4 w-4 shrink-0" />

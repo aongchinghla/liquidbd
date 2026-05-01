@@ -56,7 +56,7 @@ export default function BandCollaboration() {
             {band.members.map((member, idx) => (
               <div 
                 key={`${band.bandName}-${member.name}-${idx}`} 
-                className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-white/10 bg-neutral-900 transition-all duration-500 hover:border-sky-500/40"
+                className="group relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-white/10 bg-neutral-900 transition-all duration-500 hover:border-sky-500/40"
               >
                 <div className="relative h-full w-full grayscale transition-all duration-700 ease-in-out group-hover:grayscale-0 group-hover:scale-105">
                   <Image

@@ -38,7 +38,7 @@ export default function Reviews() {
         {reviews.map((review, idx) => (
           <div
             key={`${review.name}-${idx}`}
-            className="card-fade rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6"
+            className="card-fade rounded-lg border border-white/10 bg-white/[0.03] p-6"
           >
             <div className="mb-4 flex gap-1">
               {Array.from({ length: 5 }).map((_, i) => (

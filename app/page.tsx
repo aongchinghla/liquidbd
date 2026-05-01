@@ -1,6 +1,7 @@
 "use client";
 
 import Hero from "@/components/homepage/hero";
+import Vedeos from "@/components/homepage/vedeos";
 import Collaborations from "@/components/homepage/collaboration-strip";
 import Reviews from "@/components/homepage/reviews";
 import Newsletter from "@/components/homepage/newsletter";
@@ -15,7 +16,7 @@ import { useAppContext } from "@/context/app-context";
 import { useMemo, useState, useEffect } from "react";
 import gsap from "gsap";
 
-function ShopSection() {
+export default function Page() {
   const { addToCart } = useAppContext();
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -31,21 +32,6 @@ function ShopSection() {
     document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return (
-    <>
-      <FeaturedProducts products={products} addToCart={addToCart} />
-      <Collections onSelectCategory={handleCategorySelect} />
-      <ProductsSection
-        activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
-        filteredProducts={homeProducts}
-        addToCart={addToCart}
-      />
-    </>
-  );
-}
-
-export default function Page() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const heroItems = Array.from(document.querySelectorAll<HTMLElement>(".hero-fade"));
@@ -75,7 +61,15 @@ export default function Page() {
     <>
       <Hero />
       <Collaborations />
-      <ShopSection />
+      <Collections onSelectCategory={handleCategorySelect} />
+      <Vedeos />
+      <FeaturedProducts products={products} addToCart={addToCart} />
+      <ProductsSection
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+        filteredProducts={homeProducts}
+        addToCart={addToCart}
+      />
       <Banner />
       <BandCollaboration />
       <Reviews />

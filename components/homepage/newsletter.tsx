@@ -56,7 +56,7 @@ export default function Newsletter() {
         className="pointer-events-none absolute bottom-0 left-1/2 w-[300px] -translate-x-1/2 object-contain opacity-15 blur-[1px] sm:w-[500px] md:w-[700px]"
       />
 
-      <div className="relative z-10 card-fade mb-10 rounded-[1.125rem] border border-white/10 bg-white/[0.03] px-6 py-10 text-center backdrop-blur-sm md:mb-16 md:px-10 md:py-14">
+      <div className="relative z-10 card-fade mb-10 rounded-lg border border-white/10 bg-white/[0.03] px-6 py-10 text-center backdrop-blur-sm md:mb-16 md:px-10 md:py-14">
         <p className="text-xs uppercase tracking-[0.35em] text-white/45">
           Join The Liquid Family
         </p>

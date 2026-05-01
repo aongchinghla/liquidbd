@@ -4,18 +4,19 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section id="home" className="relative min-h-[92svh] w-full overflow-hidden">
+    <section id="home" className="relative h-[480px] w-full overflow-hidden">
       <Image
         src="/hero-image.jpg"
         alt="Liquid hero background"
         fill
         priority
-        className="object-cover object-center"
+        sizes="100vw"
+        className="object-cover object-[62%_30%] md:object-[68%_28%]"
       />
 
-      <div className="absolute inset-0 bg-black/20 z-0" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/65 via-black/28 to-black/10" />
 
-      <div className="site-shell relative z-10 flex min-h-[92svh] items-center px-4 py-12 md:py-18">
+      <div className="site-shell relative z-10 flex h-[480px] items-center px-4 py-12 md:py-18">
         <div className="w-full max-w-3xl text-left">
           
           <div className="hero-fade relative inline-block">
