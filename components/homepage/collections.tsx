@@ -11,7 +11,7 @@ const collections = [
   },
   {
     title: "Mythological Series",
-    subtitle: "Inspired from Folk Tales & Mythological Creatures",
+    subtitle: "Folk Tales & Mythic Creatures",
     button: "Mythology",
     image: "/mythologi.jpg",
   },
@@ -28,19 +28,19 @@ const heritageCards = [
     title: "Garo",
     description:
       "Rooted motifs, proud identity, and modern silhouettes shaped through stories from the Garo community.",
-    image: "/product/garo_queen.jpg",
+    image: "/wangala_festival.jpg",
   },
   {
     title: "Marma",
     description:
       "Calm visual rhythm and crafted cultural references brought into a clean, wearable direction.",
-    image: "/gallery/model_4.jpg",
+    image: "/marma.jpg",
   },
   {
     title: "Tripura",
     description:
       "Movement, celebration, and hill heritage reflected through expressive details and bold presence.",
-    image: "/product/hojagiri.jpg",
+    image: "/tripura.jpg",
   },
 ] as const;
 
@@ -86,7 +86,7 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
                 <h4 className="text-2xl font-bold text-white md:text-3xl">
                   {item.title}
                 </h4>
-                <p className="mt-2 line-clamp-2 max-w-xs text-sm text-white/70 md:text-base">
+                <p className="mt-2 max-w-full truncate text-sm text-white/70 md:text-base">
                   {item.subtitle}
                 </p>
 

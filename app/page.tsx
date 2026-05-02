@@ -74,7 +74,7 @@ export default function Page() {
       <BandCollaboration />
       <Reviews />
       <PhotoGallery />
-      <Newsletter />
+      {/* <Newsletter /> */}
     </>
   );
 }
