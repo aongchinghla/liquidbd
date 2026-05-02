@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getDiscountedPrice, getProductTabContent, hasProductDiscount, products, Product, ProductReview } from "@/lib/products";
+import { getDiscountedPrice, getProductMetaParts, getProductTabContent, hasProductDiscount, products, Product, ProductReview } from "@/lib/products";
 import { useAppContext } from "@/context/app-context";
 import { ChevronRight, Minus, Plus, ShoppingBag, Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import Link from "next/link";
@@ -263,8 +263,7 @@ export default function ProductDetailsPage() {
 
         <div className="flex flex-col w-full lg:max-w-[500px] lg:mr-auto">
           <div className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.25em] text-white/40">
-            {product.productType}
-            {product.category ? ` | ${product.category}` : ""}
+            {getProductMetaParts(product).join(" | ")}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl lg:text-4xl">
             {product.name}

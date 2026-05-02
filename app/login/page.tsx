@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { gsap } from "gsap";
 import { useAppContext } from "@/context/app-context";
+import { BANGLADESH_DISTRICTS, getBangladeshDistrictValue } from "@/lib/checkout";
 import { getUserOrderHistory, OrderHistoryItem } from "@/lib/orders";
 
 interface AuthForm {
@@ -122,6 +123,7 @@ function LoginContent() {
   const [expandedOrderId, setExpandedOrderId] = React.useState<string | null>(null);
   const [orderLookup, setOrderLookup] = React.useState({ name: "", email: "" });
   const accountView = getAccountViewParam(searchParams.get("view"));
+  const selectedDistrict = getBangladeshDistrictValue(checkoutForm.district);
 
   useEffect(() => {
     const mode = searchParams.get("mode");
@@ -613,6 +615,31 @@ function LoginContent() {
                     </span>
                   </label>
 
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">District</span>
+                    <span className="relative block">
+                      <MapPinned className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <select
+                        value={selectedDistrict}
+                        onChange={(e) => handleCheckoutInput("district", e.target.value)}
+                        className={`h-12 w-full appearance-none rounded-lg border border-white/10 bg-black/20 pl-11 pr-10 text-sm outline-none transition focus:border-white/25 ${
+                          selectedDistrict ? "text-white" : "text-white/45"
+                        }`}
+                        aria-label="District"
+                      >
+                        <option value="" disabled hidden className="bg-white text-black">
+                          Select district
+                        </option>
+                        {BANGLADESH_DISTRICTS.map((district) => (
+                          <option key={district} value={district} className="bg-white text-black">
+                            {district}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+                    </span>
+                  </label>
+
                   <label className="space-y-2 md:col-span-2">
                     <span className="text-xs uppercase tracking-widest text-white/35">Delivery address</span>
                     <span className="relative block">
@@ -820,6 +847,9 @@ function LoginContent() {
                                     <p className="mt-2 text-sm font-medium text-white/85">
                                       {order.checkout.name || order.customerName}
                                     </p>
+                                    {order.checkout.district ? (
+                                      <p className="mt-1 text-sm text-white/60">{order.checkout.district}</p>
+                                    ) : null}
                                     <p className="mt-1 text-sm leading-6 text-white/50">
                                       {order.checkout.address || "Address not available"}
                                     </p>

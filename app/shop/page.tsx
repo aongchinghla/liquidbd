@@ -7,12 +7,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Home, ChevronRight } from "lucide-react"; 
 import ProductCard from "@/components/ui/product-card";
 import { useAppContext } from "@/context/app-context";
-import { PRODUCT_TYPES, products } from "@/lib/products";
+import { CULTURES, PRODUCT_TYPES, products } from "@/lib/products";
 
 const filters = ["All", "Ganna", "Mythology", "Collaboration"] as const;
 const filterMap = new Map(filters.map((filter) => [filter.toLowerCase(), filter] as const));
 const typeFilters = ["All Types", ...PRODUCT_TYPES] as const;
 const typeFilterMap = new Map(typeFilters.map((filter) => [filter.toLowerCase(), filter] as const));
+const cultureFilters = ["All Cultures", ...CULTURES] as const;
+const cultureFilterMap = new Map(cultureFilters.map((filter) => [filter.toLowerCase(), filter] as const));
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-BD", {
@@ -35,12 +37,13 @@ function ShopPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<"category" | "type" | "culture" | null>(null);
   const activeFilter =
     filterMap.get(searchParams.get("category")?.toLowerCase() ?? "all") ?? "All";
   const activeTypeFilter =
     typeFilterMap.get(searchParams.get("type")?.toLowerCase() ?? "all types") ?? "All Types";
+  const activeCultureFilter =
+    cultureFilterMap.get(searchParams.get("culture")?.toLowerCase() ?? "all cultures") ?? "All Cultures";
 
   const updateFilter = (filter: (typeof filters)[number]) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -68,14 +71,35 @@ function ShopPageContent() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
+  const updateCultureFilter = (filter: (typeof cultureFilters)[number]) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (filter === "All Cultures") {
+      params.delete("culture");
+    } else {
+      params.set("culture", filter.toLowerCase());
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategory = activeFilter === "All" || product.category === activeFilter;
       const matchesType = activeTypeFilter === "All Types" || product.productType === activeTypeFilter;
+      const matchesCulture = activeCultureFilter === "All Cultures" || product.culture === activeCultureFilter;
 
-      return matchesCategory && matchesType;
+      return matchesCategory && matchesType && matchesCulture;
     });
-  }, [activeFilter, activeTypeFilter]);
+  }, [activeCultureFilter, activeFilter, activeTypeFilter]);
+
+  const selectedLabels = [
+    activeCultureFilter !== "All Cultures" ? activeCultureFilter : "",
+    activeTypeFilter !== "All Types" ? activeTypeFilter : "",
+    activeFilter !== "All" ? activeFilter : "",
+  ].filter(Boolean);
+  const pageTitle = selectedLabels.length > 0 ? selectedLabels.join(" | ") : "All Products";
 
   return (
     <div className="w-full">
@@ -102,10 +126,10 @@ function ShopPageContent() {
             
             <span className="text-white/40">Shop</span>
             
-            {activeFilter !== "All" && (
+            {activeCultureFilter !== "All Cultures" && (
               <>
                 <ChevronRight size={10} className="text-white/30" />
-                <span className="text-sky-400">{activeFilter}</span>
+                <span className="text-emerald-300">{activeCultureFilter}</span>
               </>
             )}
 
@@ -115,48 +139,47 @@ function ShopPageContent() {
                 <span className="text-sky-300">{activeTypeFilter}</span>
               </>
             )}
+
+            {activeFilter !== "All" && (
+              <>
+                <ChevronRight size={10} className="text-white/30" />
+                <span className="text-sky-400">{activeFilter}</span>
+              </>
+            )}
           </div>
 
           <div className="text-center">
             <p className="text-xs uppercase tracking-[0.35em] text-white/60">Collection</p>
-            <h1 className="mt-3 text-3xl font-semibold md:text-5xl text-white">
-              {activeTypeFilter === "All Types"
-                ? activeFilter === "All"
-                  ? "All Products"
-                  : activeFilter
-                : `${activeTypeFilter}${activeFilter === "All" ? "" : ` | ${activeFilter}`}`}
-            </h1>
+            <h1 className="mt-3 text-3xl font-semibold md:text-5xl text-white">{pageTitle}</h1>
           </div>
         </div>
       </div>
 
       <div className="site-shell pb-10 lg:pb-14">
         <section id="shop-products">
-
           <div className="mb-10 flex flex-col justify-center gap-4 md:flex-row">
             <div className="relative w-full md:w-64">
               <button
                 onClick={() => {
-                  setIsDropdownOpen(!isDropdownOpen);
-                  setIsTypeDropdownOpen(false);
+                  setOpenDropdown((current) => (current === "culture" ? null : "culture"));
                 }}
                 className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20"
               >
-                <span>Category: <span className="text-sky-400">{activeFilter}</span></span>
-                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+                <span>Culture: <span className="text-emerald-300">{activeCultureFilter}</span></span>
+                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${openDropdown === "culture" ? "rotate-180" : ""}`} />
               </button>
 
-              {isDropdownOpen && (
+              {openDropdown === "culture" && (
                 <div className="absolute left-0 z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] shadow-2xl backdrop-blur-xl">
-                  {filters.map((filter) => (
+                  {cultureFilters.map((filter) => (
                     <button
                       key={filter}
                       onClick={() => {
-                        updateFilter(filter);
-                        setIsDropdownOpen(false);
+                        updateCultureFilter(filter);
+                        setOpenDropdown(null);
                       }}
                       className={`w-full px-5 py-3 text-left text-sm transition hover:bg-white/5 ${
-                        activeFilter === filter ? "bg-white/10 text-sky-400" : "text-white/70"
+                        activeCultureFilter === filter ? "bg-white/10 text-emerald-300" : "text-white/70"
                       }`}
                     >
                       {filter}
@@ -169,26 +192,56 @@ function ShopPageContent() {
             <div className="relative w-full md:w-64">
               <button
                 onClick={() => {
-                  setIsTypeDropdownOpen(!isTypeDropdownOpen);
-                  setIsDropdownOpen(false);
+                  setOpenDropdown((current) => (current === "type" ? null : "type"));
                 }}
                 className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20"
               >
                 <span>Type: <span className="text-sky-400">{activeTypeFilter}</span></span>
-                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isTypeDropdownOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${openDropdown === "type" ? "rotate-180" : ""}`} />
               </button>
 
-              {isTypeDropdownOpen && (
+              {openDropdown === "type" && (
                 <div className="absolute left-0 z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] shadow-2xl backdrop-blur-xl">
                   {typeFilters.map((filter) => (
                     <button
                       key={filter}
                       onClick={() => {
                         updateTypeFilter(filter);
-                        setIsTypeDropdownOpen(false);
+                        setOpenDropdown(null);
                       }}
                       className={`w-full px-5 py-3 text-left text-sm transition hover:bg-white/5 ${
                         activeTypeFilter === filter ? "bg-white/10 text-sky-400" : "text-white/70"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative w-full md:w-64">
+              <button
+                onClick={() => {
+                  setOpenDropdown((current) => (current === "category" ? null : "category"));
+                }}
+                className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20"
+              >
+                <span>Category: <span className="text-sky-400">{activeFilter}</span></span>
+                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${openDropdown === "category" ? "rotate-180" : ""}`} />
+              </button>
+
+              {openDropdown === "category" && (
+                <div className="absolute left-0 z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-[#0f0f0f] shadow-2xl backdrop-blur-xl">
+                  {filters.map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => {
+                        updateFilter(filter);
+                        setOpenDropdown(null);
+                      }}
+                      className={`w-full px-5 py-3 text-left text-sm transition hover:bg-white/5 ${
+                        activeFilter === filter ? "bg-white/10 text-sky-400" : "text-white/70"
                       }`}
                     >
                       {filter}
@@ -212,7 +265,7 @@ function ShopPageContent() {
           
           {filteredProducts.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-white/40">No products found for this category and type.</p>
+              <p className="text-white/40">No products found for the selected category, type, and culture.</p>
             </div>
           )}
         </section>

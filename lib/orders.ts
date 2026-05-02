@@ -16,6 +16,7 @@ export interface OrderHistoryCheckoutSnapshot {
   name: string;
   email: string;
   phone: string;
+  district: string;
   address: string;
 }
 

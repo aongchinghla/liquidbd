@@ -3,8 +3,10 @@ export interface Color {
   hex: string;
 }
 
-export const PRODUCT_TYPES = ["T-Shirt", "Shirt"] as const;
+export const PRODUCT_TYPES = ["T-Shirt", "Shirt", "Pants"] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
+export const CULTURES = ["Garo", "Marma", "Tripura"] as const;
+export type ProductCulture = (typeof CULTURES)[number];
 
 export interface Product {
   id: number;
@@ -15,6 +17,7 @@ export interface Product {
   tag?: string;
   productType: ProductType;
   category: string;
+  culture: ProductCulture | "";
   image: string;
   images: string[];
   colors: Color[];
@@ -74,6 +77,14 @@ export function getProductTabContent(product: Product): ProductTabContent {
   };
 }
 
+export function getProductMetaParts(
+  product: Pick<Product, "productType" | "category" | "culture">
+) {
+  return [product.productType, product.category.trim(), product.culture.trim()].filter(
+    (value): value is string => value.length > 0
+  );
+}
+
 const slugify = (text: string) =>
   text
     .toLowerCase()
@@ -86,9 +97,10 @@ export const products: Product[] = [
     slug: "hojagiri-boishabi",
     name: "Hojagiri-Boishabi",
     price: 500,
-    tag: "CHT",
+    tag: "",
     productType: "T-Shirt",
-    category: "Cht",
+    category: "",
+    culture: "Tripura",
     image: "/product/hojagiri.jpg",
     images: [
       "/product/hojagiri.jpg",
@@ -125,6 +137,7 @@ export const products: Product[] = [
     tag: "Best Seller",
     productType: "T-Shirt",
     category: "",
+    culture: "Marma",
     image: "/product/ajau.jpg",
     images: [
       "/product/ajau.jpg",
@@ -168,6 +181,7 @@ export const products: Product[] = [
     tag: "",
     productType: "T-Shirt",
     category: "Collaboration",
+    culture: "",
     image: "/product/rabuga_bitchi.jpg",
     images: [
       "/product/rabuga_bitchi.jpg",
@@ -204,6 +218,7 @@ export const products: Product[] = [
     tag: "Limited",
     productType: "T-Shirt",
     category: "Mythology",
+    culture: "",
     image: "/product/buga_rani.jpg",
     images: [
       "/product/buga_rani.jpg",
@@ -241,6 +256,7 @@ export const products: Product[] = [
     tag: "Premium",
     productType: "T-Shirt",
     category: "Ganna",
+    culture: "Garo",
     image: "/product/ganna.jpg",
     images: [
       "/product/ganna.jpg",
@@ -277,6 +293,7 @@ export const products: Product[] = [
     tag: "",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/garo_king.jpg",
     images: [
       "/product/garo_king.jpg",
@@ -313,6 +330,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/garo_queen.jpg",
     images: [
       "/product/garo_queen.jpg",
@@ -349,6 +367,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "Ganna",
+    culture: "Garo",
     image: "/ha.a_ganna.jpg",
     images: [
       "/ha.a_ganna.jpg",
@@ -385,6 +404,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "Ganna",
+    culture: "Garo",
     image: "/product/jang.ki_ganna.jpg",
     images: [
       "/product/jang.ki_ganna.jpg",
@@ -421,6 +441,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/kha_marak.jpg",
     images: [
       "/product/kha_marak.jpg",
@@ -457,6 +478,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/kha_sangma.jpg",
     images: [
       "/product/kha_sangma.jpg",
@@ -493,6 +515,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "",
+    culture: "",
     image: "/product/liquid_tee.jpg",
     images: [
       "/product/liquid_tee.jpg",
@@ -529,6 +552,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/misi_saljong.jpg",
     images: [
       "/product/misi_saljong.jpg",
@@ -565,6 +589,7 @@ export const products: Product[] = [
     tag: "Capsule",
     productType: "T-Shirt",
     category: "Nokna",
+    culture: "Garo",
     image: "/product/nokna.jpg",
     images: [
       "/product/nokna.jpg",
@@ -601,6 +626,7 @@ export const products: Product[] = [
     tag: "",
     productType: "T-Shirt",
     category: "Ganna",
+    culture: "Garo",
     image: "/product/red_ganna.jpg",
     images: [
       "/product/red_ganna.jpg",
@@ -637,6 +663,7 @@ export const products: Product[] = [
     tag: "",
     productType: "T-Shirt",
     category: "Collaboration",
+    culture: "",
     image: "/product/sacrament.jpg",
     images: [
       "/product/sacrament.jpg",
@@ -673,6 +700,7 @@ export const products: Product[] = [
     tag: "",
     productType: "T-Shirt",
     category: "",
+    culture: "Garo",
     image: "/product/wangala.jpg",
     images: [
       "/product/wangala.jpg",

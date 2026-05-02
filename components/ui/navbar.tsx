@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, LogOut, Menu, Package, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { products, Product } from "@/lib/products";
+import { getProductMetaParts, products, Product } from "@/lib/products";
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -53,6 +53,7 @@ export default function Navbar({
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.productType.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.culture.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (product.tag && product.tag.toLowerCase().includes(searchQuery.toLowerCase()))
       )
       .slice(0, 5);
@@ -130,7 +131,7 @@ export default function Navbar({
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
                 <input
                   type="text"
-                  placeholder="Search products, type, or category..."
+                  placeholder="Search products, type, category, or culture..."
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   className="h-10 w-full rounded-full border border-white/10 bg-white/[0.03] pl-11 pr-11 text-sm text-white placeholder:text-white/28 outline-none transition focus:border-white/20"
@@ -455,10 +456,7 @@ function SearchResults({
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-white">{product.name}</p>
-            <p className="mt-1 text-xs text-white/40">
-              {product.productType}
-              {product.category ? ` · ${product.category}` : ""}
-            </p>
+            <p className="mt-1 text-xs text-white/40">{getProductMetaParts(product).join(" · ")}</p>
           </div>
         </Link>
       ))}

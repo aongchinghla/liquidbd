@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   BadgeInfo,
   CheckCircle2,
+  ChevronDown,
   CreditCard,
   Mail,
   MapPin,
@@ -19,7 +20,13 @@ import {
   User,
 } from "lucide-react";
 import { useAppContext } from "@/context/app-context";
-import { calculatePromoDiscount, normalizePromoCode } from "@/lib/checkout";
+import {
+  BANGLADESH_DISTRICTS,
+  calculatePromoDiscount,
+  getBangladeshDistrictValue,
+  getDeliveryCharge,
+  normalizePromoCode,
+} from "@/lib/checkout";
 import { getDiscountedPrice, hasProductDiscount } from "@/lib/products";
 
 function formatPrice(price: number) {
@@ -55,7 +62,8 @@ export default function CheckoutPage() {
     nagadTransactionId: string;
   } | null>(null);
   const successSectionRef = useRef<HTMLDivElement>(null);
-  const deliveryCharge = subtotal > 0 ? 80 : 0;
+  const selectedDistrict = getBangladeshDistrictValue(checkoutForm.district);
+  const deliveryCharge = getDeliveryCharge(subtotal, checkoutForm.district);
   const promo = calculatePromoDiscount(subtotal, checkoutForm.promoCode);
   const total = Math.max(subtotal + deliveryCharge - promo.discount, 0);
   const orderId = useMemo(() => `LIQ-${Date.now().toString().slice(-6)}`, []);
@@ -103,8 +111,14 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (!checkoutForm.name.trim() || !trimmedEmail || !checkoutForm.phone.trim() || !checkoutForm.address.trim()) {
-      setError("Please fill in your name, email, phone number, and delivery address.");
+    if (
+      !checkoutForm.name.trim() ||
+      !trimmedEmail ||
+      !checkoutForm.phone.trim() ||
+      !selectedDistrict ||
+      !checkoutForm.address.trim()
+    ) {
+      setError("Please fill in your name, email, phone number, district, and delivery address.");
       return;
     }
 
@@ -326,6 +340,32 @@ export default function CheckoutPage() {
                         className="h-12 w-full rounded-xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-white/25"
                       />
                     </span>
+                  </label>
+
+                  <label className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-white/35">District</span>
+                    <span className="relative block">
+                      <MapPin className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                      <select
+                        value={selectedDistrict}
+                        onChange={(e) => handleCheckoutInput("district", e.target.value)}
+                        className={`h-12 w-full appearance-none rounded-xl border border-white/10 bg-black/20 pl-11 pr-10 text-sm outline-none transition focus:border-white/25 ${
+                          selectedDistrict ? "text-white" : "text-white/45"
+                        }`}
+                        aria-label="District"
+                      >
+                        <option value="" disabled hidden className="bg-white text-black">
+                          Select district
+                        </option>
+                        {BANGLADESH_DISTRICTS.map((district) => (
+                          <option key={district} value={district} className="bg-white text-black">
+                            {district}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+                    </span>
+                    <p className="text-[11px] text-white/40">Dhaka delivery: 80 Tk, outside Dhaka: 120 Tk.</p>
                   </label>
 
                   <label className="space-y-2 md:col-span-2">
@@ -585,7 +625,6 @@ export default function CheckoutPage() {
                       </button>
                     )}
                   </div>
-                  <p className="mt-3 text-xs text-white/40">Use `LIQUID10` for 10% off on your subtotal.</p>
                   {isPromoApplied && (
                     <p className="mt-2 text-xs text-emerald-300">
                       {promo.appliedPromoCode} applied. You saved {formatPrice(promo.discount)}.
@@ -604,7 +643,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex items-center justify-between text-white/60">
                   <span>Delivery</span>
-                  <span>{formatPrice(deliveryCharge)}</span>
+                  <span>{selectedDistrict ? formatPrice(deliveryCharge) : "Select district"}</span>
                 </div>
                 {promo.discount > 0 && (
                   <div className="flex items-center justify-between text-emerald-300">

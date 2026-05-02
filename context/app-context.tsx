@@ -3,7 +3,12 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getDiscountedPrice, Product } from "@/lib/products";
 import { CartItem } from "@/components/modals/cart-drawer";
-import { calculatePromoDiscount, CheckoutForm } from "@/lib/checkout";
+import {
+  calculatePromoDiscount,
+  CheckoutForm,
+  getBangladeshDistrictValue,
+  getDeliveryCharge,
+} from "@/lib/checkout";
 import { saveOrderToHistory } from "@/lib/orders";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
@@ -40,6 +45,7 @@ function getPersistedCheckoutForm(checkoutForm: CheckoutForm) {
     name: checkoutForm.name,
     email: checkoutForm.email,
     phone: checkoutForm.phone,
+    district: checkoutForm.district,
     address: checkoutForm.address,
     promoCode: checkoutForm.promoCode,
   };
@@ -138,6 +144,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     name: "",
     email: "",
     phone: "",
+    district: "",
     address: "",
     promoCode: "",
     paymentMethod: "Cash on Delivery",
@@ -160,6 +167,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setCheckoutForm((prev) => ({
           ...prev,
           ...parsedCheckout,
+          district: getBangladeshDistrictValue(parsedCheckout?.district ?? ""),
           paymentMethod: "Cash on Delivery",
           bkashSenderLast4: "",
           bkashTransactionId: "",
@@ -211,7 +219,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const placeOrder = (orderId: string) => {
-    const deliveryCharge = subtotal > 0 ? 80 : 0;
+    const deliveryCharge = getDeliveryCharge(subtotal, checkoutForm.district);
     const promo = calculatePromoDiscount(subtotal, checkoutForm.promoCode);
     const total = Math.max(subtotal + deliveryCharge - promo.discount, 0);
     const orderRecord = {
@@ -245,6 +253,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         name: checkoutForm.name,
         email: checkoutForm.email,
         phone: checkoutForm.phone,
+        district: checkoutForm.district,
         address: checkoutForm.address,
       },
       placedAt: new Date().toISOString(),
