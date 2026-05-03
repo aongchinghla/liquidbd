@@ -28,7 +28,7 @@ const CLIENT_GALLERY_IMAGES = [
   { src: "/gallery/model.jpg", alt: "Client wearing Liquid BD t-shirt" },
   { src: "/gallery/model_2.jpg", alt: "Customer styling a Liquid BD tee" },
   { src: "/gallery/model_3.jpg", alt: "Streetwear client look in Liquid BD apparel" },
-  { src: "/gallery/model_4.jpg", alt: "Lifestyle photo of a client in Liquid BD shirt" },
+  { src: "/gallery/model_4_v2.jpg", alt: "Lifestyle photo of a client in Liquid BD shirt" },
   { src: "/gallery/model_5.jpg", alt: "Client portrait featuring a Liquid BD t-shirt" },
   { src: "/gallery/model_9.jpg", alt: "Liquid BD community gallery photo" },
 ] as const;

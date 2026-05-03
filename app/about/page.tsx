@@ -52,7 +52,7 @@ const milestones: Milestone[] = [
     date: "Today",
     title: "Fashion Brand",
     description: "Setting home in a limited cloud.",
-    image: "/gallery/model_4.jpg",
+    image: "/gallery/model_4_v2.jpg",
     cta: {
       label: "Shop with Purpose",
       href: "/shop",

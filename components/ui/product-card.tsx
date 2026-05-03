@@ -25,6 +25,7 @@ export default function ProductCard({
   const requiresVariantSelection = product.colors.length > 1 || product.sizes.length > 1;
   const [isVariantSelectorOpen, setIsVariantSelectorOpen] = useState(false);
   const [isVariantSelectorClosing, setIsVariantSelectorClosing] = useState(false);
+  const [isQuickAddCtaVisible, setIsQuickAddCtaVisible] = useState(true);
   const [selectedColor, setSelectedColor] = useState(defaultColor);
   const [selectedSize, setSelectedSize] = useState(defaultSize);
   const selectorRef = useRef<HTMLDivElement | null>(null);
@@ -93,11 +94,13 @@ export default function ProductCard({
       if (!selectorRef.current) {
         setIsVariantSelectorOpen(false);
         setIsVariantSelectorClosing(false);
+        setIsQuickAddCtaVisible(true);
       }
       return;
     }
 
     setIsVariantSelectorClosing(true);
+    setIsQuickAddCtaVisible(true);
     selectorAnimationRef.current?.kill();
 
     const selectorItems = selectorItemsRef.current.filter(
@@ -140,6 +143,7 @@ export default function ProductCard({
     if (requiresVariantSelection) {
       setSelectedColor(defaultColor);
       setSelectedSize(defaultSize);
+      setIsQuickAddCtaVisible(false);
       setIsVariantSelectorClosing(false);
       setIsVariantSelectorOpen(true);
       return;
@@ -216,16 +220,20 @@ export default function ProductCard({
         </div>
 
         <div className="relative mt-4 min-h-[48px]">
-          {!isVariantSelectorOpen ? (
-            <button
-              type="button"
-              onClick={handleQuickAdd}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#2f7ea1]/60 bg-white/[0.05] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:border-[#2f7ea1] hover:bg-white hover:text-black active:scale-95"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              Quick Add
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={handleQuickAdd}
+            disabled={!isQuickAddCtaVisible || isVariantSelectorClosing}
+            aria-hidden={!isQuickAddCtaVisible}
+            className={`flex w-full items-center justify-center gap-2 rounded-xl border border-[#2f7ea1]/60 bg-white/[0.05] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all duration-300 ease-out hover:border-[#2f7ea1] hover:bg-white hover:text-black active:scale-95 ${
+              isQuickAddCtaVisible
+                ? "translate-y-0 scale-100 opacity-100"
+                : "pointer-events-none translate-y-3 scale-95 opacity-0"
+            }`}
+          >
+            <ShoppingBag className="h-4 w-4" />
+            Quick Add
+          </button>
           {isVariantSelectorOpen ? (
             <div
               ref={selectorRef}

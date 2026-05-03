@@ -1,10 +1,10 @@
 "use client";
 
-import { Product } from "@/lib/products";
+import { CULTURES, Product } from "@/lib/products";
 import ProductCard from "@/components/ui/product-card";
 import Link from "next/link";
 
-const filters = ["All", "Ganna", "Mythology", "Collaboration"];
+const filters = ["All", "Ganna", "Mythology", "Collaboration", ...CULTURES];
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("en-BD", {

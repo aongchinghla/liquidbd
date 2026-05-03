@@ -1,12 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 const shopLinks = [
   { label: "All Products", href: "/shop" },
   { label: "Ganna Series", href: "/shop?category=ganna" },
   { label: "Mythology", href: "/shop?category=mythology" },
   { label: "Collaborations", href: "/shop?category=collaboration" },
+];
+
+const cultureLinks = [
+  { label: "Garo", href: "/shop?culture=garo" },
+  { label: "Marma", href: "/shop?culture=marma" },
+  { label: "Tripura", href: "/shop?culture=tripura" },
 ];
 
 const companyLinks = [
@@ -86,6 +92,23 @@ export default function Footer() {
                   </Link>
                 ))}
               </div>
+
+              <div className="mt-6">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/30">
+                  Culture
+                </h4>
+                <div className="mt-4 flex flex-col gap-3">
+                  {cultureLinks.map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="text-sm text-white/58 transition hover:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div>
@@ -156,7 +179,7 @@ export default function Footer() {
 
         <div className="mt-9 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-white/38 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <p>©2026 Liquid. All rights reserved.</p>
+            <p>© 2026 Liquid. | All rights reserved.</p>
           </div>
         </div>
       </div>

@@ -22,7 +22,10 @@ export default function Page() {
 
   const filteredProducts = useMemo(() => {
     if (activeFilter === "All") return products;
-    return products.filter((product) => product.category === activeFilter);
+    return products.filter(
+      (product) =>
+        product.category === activeFilter || product.culture === activeFilter
+    );
   }, [activeFilter]);
 
   const homeProducts = useMemo(() => filteredProducts.slice(0, 8), [filteredProducts]);
@@ -72,8 +75,8 @@ export default function Page() {
       />
       <Banner />
       <BandCollaboration />
-      <Reviews />
       <PhotoGallery />
+      <Reviews />
       {/* <Newsletter /> */}
     </>
   );

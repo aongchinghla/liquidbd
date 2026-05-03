@@ -4,7 +4,7 @@ const galleryImages = [
   { id: 1, src: "/gallery/model.jpg" }, 
   { id: 2, src: "/gallery/model_2.jpg" },
   { id: 3, src: "/gallery/model_3.jpg" },
-  { id: 4, src: "/gallery/model_4.jpg" },
+  { id: 4, src: "/gallery/model_4_v2.jpg" },
   { id: 5, src: "/gallery/model_5.jpg" },
   { id: 6, src: "/gallery/model_9.jpg" },
   { id: 7, src: "/gallery/model_7.jpg" },

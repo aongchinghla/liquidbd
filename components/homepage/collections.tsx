@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const collections = [
   {
@@ -29,18 +30,24 @@ const heritageCards = [
     description:
       "Rooted motifs, proud identity, and modern silhouettes shaped through stories from the Garo community.",
     image: "/wangala_festival.jpg",
+    button: "Explore Garo",
+    href: "/shop?culture=garo",
   },
   {
     title: "Marma",
     description:
       "Calm visual rhythm and crafted cultural references brought into a clean, wearable direction.",
     image: "/marma.jpg",
+    button: "Explore Marma",
+    href: "/shop?culture=marma",
   },
   {
     title: "Tripura",
     description:
       "Movement, celebration, and hill heritage reflected through expressive details and bold presence.",
     image: "/tripura.jpg",
+    button: "Explore Tripura",
+    href: "/shop?culture=tripura",
   },
 ] as const;
 
@@ -120,6 +127,12 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
               <p className="mt-3 max-w-md text-sm leading-relaxed text-white/72 md:text-base">
                 {heritageCards[0].description}
               </p>
+              <Link
+                href={heritageCards[0].href}
+                className="mt-6 inline-flex items-center justify-center rounded-lg bg-sky-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-sky-500 active:scale-95"
+              >
+                {heritageCards[0].button}
+              </Link>
             </div>
           </div>
         </article>
@@ -146,6 +159,12 @@ export default function Collections({ onSelectCategory }: CollectionsProps) {
                   <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/72">
                     {item.description}
                   </p>
+                  <Link
+                    href={item.href}
+                    className="mt-5 inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sky-500 active:scale-95"
+                  >
+                    {item.button}
+                  </Link>
                 </div>
               </div>
             </article>
