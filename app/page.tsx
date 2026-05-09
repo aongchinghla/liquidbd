@@ -1,7 +1,7 @@
 "use client";
 
 import Hero from "@/components/homepage/hero";
-import Vedeos from "@/components/homepage/vedeos";
+import Videos from "@/components/homepage/videos";
 import Collaborations from "@/components/homepage/collaboration-strip";
 import Reviews from "@/components/homepage/reviews";
 import Newsletter from "@/components/homepage/newsletter";
@@ -65,7 +65,7 @@ export default function Page() {
       <Hero />
       <Collaborations />
       <Collections onSelectCategory={handleCategorySelect} />
-      <Vedeos />
+      <Videos />
       <FeaturedProducts products={products} addToCart={addToCart} />
       <ProductsSection
         activeFilter={activeFilter}

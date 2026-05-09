@@ -32,7 +32,7 @@ export default function BandCollaboration() {
       <div className="mb-12 border-l-4 border-sky-600 pl-6">
         <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">Band Collaborations</p>
         <h3 className="mt-2 text-3xl font-bold md:text-5xl uppercase tracking-tighter italic">
-          The Lineup
+          Our Collaborators
         </h3>
       </div>
 

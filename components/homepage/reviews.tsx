@@ -42,7 +42,7 @@ export default function Reviews() {
           >
             <div className="mb-4 flex gap-1">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-white text-white" />
+                <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
               ))}
             </div>
             <p className="text-sm leading-7 text-white/65">“{review.copy}”</p>
